@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: overtime_backend
+    command: /start
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./backend:/app
+    ports:
+      - 127.0.0.1:8000:8000
+    networks:
+      - overtime_network
+    depends_on:
+      - database
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: overtime_frontend
+    command: npm start
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./frontend/overtime:/app
+    ports:
+      - 127.0.0.1:3000:3000
+    depends_on:
+      - backend
+    networks:
+      - overtime_network
+
+
+  database:
+    image: postgres:15-alpine3.17
+    container_name: overtime_postgres
+    env_file:
+      - .env
+    restart: always
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5432:5432
+    networks:
+      - overtime_network
+
+networks:
+  overtime_network:
+    driver: bridge
+
+volumes:
+  pgdata:
