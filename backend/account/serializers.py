@@ -28,7 +28,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'password', 'password2')
 
     def validate(self, attrs):
+        """Validate and authenticate the user."""
         if len(attrs.get("password")) < 5:
             raise serializers.ValidationError(
-
+                {"password": "Password is too short (min. 5 chars)."}
             )
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match."}
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        """Create a new user."""
+        user = get_user_model().objects.create_user(
+            validated_data["email"],
+            validated_data["password"],
+        )
+        # user.is_active = validated_data['is_active']
+        user.save()
+        return user

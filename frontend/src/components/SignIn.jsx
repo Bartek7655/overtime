@@ -2,17 +2,28 @@ import React from "react"
 
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
-import {required, email, password} from "../validators/validators.jsx";
+import {required, email} from "../validators/validators.jsx";
 import {Button} from "@mui/material";
+
+import axiosInstance from "../axios/axios";
 
 
 const SignIn = () => {
-    // const login = (data) => {
-    //     console.log(data.email, data.password, data.password2)
-    // }
+    const login = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.target);
+        axiosInstance.post(
+            "account/signin/", data
+        ).then((response)=> {
+            localStorage.setItem("access_token", response.data.access);
+            localStorage.setItem("refresh_token", response.data.refresh);
+            window.location.replace('/');
+        })
+
+    }
 
     return (
-        <Form onSubmit={()=> login()}>
+        <Form onSubmit={login}>
             <label>
                 Email
                 <Input
@@ -30,15 +41,7 @@ const SignIn = () => {
                 />
             </label>
 
-            <label>
-                Repeat Password
-                <Input
-                    type="password"
-                    name="password2"
-                    validations={[required, password]}
-                />
-            </label>
-            <Button variant="contained">Login</Button>
+            <Button type="submit" variant="contained" >Login</Button>
         </Form>
     )
 }

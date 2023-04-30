@@ -1,11 +1,12 @@
 import React from 'react';
-import SignIn from "./SingIn.jsx";
+import Home from "./Home.jsx";
 
-export function App({ props }) {
+export function App() {
   return (
-    <div>
-        <SignIn/>
-      Webpack HMR Example change
-    </div>
+      <>
+        <Home/>
+      </>
   );
 }
+
+export default App
