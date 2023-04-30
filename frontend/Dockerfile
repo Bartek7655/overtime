@@ -15,7 +15,6 @@ RUN apk add --no-cache --virtual .gyp \
 
 COPY . .
 
-#RUN npm run develop
 RUN adduser \
     --disabled-password \
     # --no-create-home \

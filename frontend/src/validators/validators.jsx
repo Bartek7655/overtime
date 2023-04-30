@@ -14,7 +14,7 @@ export const email = (value) => {
     }
 };
 
-export const password = (value, props, components) => {
+export const password_same = (value, props, components) => {
     if(value !== components['password'][0].value){
         return <Alert severity="warning">Passwords must be the same</Alert>
     }
