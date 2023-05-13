@@ -11,5 +11,4 @@ urlpatterns = [
     path('signup/', views.RegisterView.as_view(), name='register'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('testapi/', views.TestApi.as_view()),
-
 ]
