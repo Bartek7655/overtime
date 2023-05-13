@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account',
+    'count_hours',
     'rest_framework_simplejwt',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
@@ -162,7 +163,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=0, minutes=0, seconds=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=0, minutes=10, seconds=0),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
