@@ -2,6 +2,7 @@ import React from "react"
 import {Button, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
+import axiosInstance from "../../axios/axios";
 
 const OneDay = (props) => {
     const {day, month, dayOfTheWeek} = props
@@ -9,11 +10,10 @@ const OneDay = (props) => {
     const convertStringToTime = (string) => {
         try{
             const [hours, minutes] = string.split(":")
-            const time = set_time_object(hours, minutes)
-            return time
+            return set_time_object(hours, minutes)
 
         }catch (error){
-            console.error("An error occured: ", string)
+            console.error("An error occurred: ", string)
         }
     }
 
@@ -23,6 +23,10 @@ const OneDay = (props) => {
         const {start_time, end_time} = get_times(data)
         const difference_in_minutes = convert_milliseconds_to_minutes(end_time - start_time)
         const time_without_pause = subtract_pause(difference_in_minutes)
+        axiosInstance.post('/api/type-overtime/', {
+            "date": `${day}.${month}.${new Date().getFullYear()}`,
+            "overtime": difference_in_minutes
+        })
         console.log(time_without_pause)
     }
 
@@ -35,29 +39,32 @@ const OneDay = (props) => {
     }
 
     const set_time_object = (hours, minutes) => {
-        const time_object = new Date(`July 1, 1999, ${hours}:${minutes}:00`)
-        return time_object
+        return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
     }
 
     const subtract_pause = (difference_in_minutes) => {
-        // TODO Assign pauses to hours and subtract it.
-        // const {twelve_hours, pause_twelve} = 720
-        const nine_hours = 540
-        const six_hours = 360
-        // if(difference_in_minutes > twelve_hours){
-        //
-        // }
+        const twelve_hours = {"minutes": 720, "pause": 60}
+        const nine_hours = {"minutes": 540, "pause": 45}
+        const six_hours = {"minutes": 360, "pause" : 30}
+
+        if(difference_in_minutes >= twelve_hours.minutes){
+            return difference_in_minutes - twelve_hours.pause
+        }else if(difference_in_minutes >= nine_hours.minutes){
+            return difference_in_minutes - nine_hours.pause
+        }else if(difference_in_minutes >= six_hours.minutes){
+            return difference_in_minutes - six_hours.pause
+        }else{
+            return difference_in_minutes
+        }
     }
 
     const convert_milliseconds_to_minutes = (milliseconds) => {
         return Math.floor(milliseconds/60000)
     }
 
-
-
     return(
         <Grid item>
-            {day}.{month+1} {dayOfTheWeek}
+            {day}.{month} {dayOfTheWeek}
             <Form onSubmit={count}>
                 <label>
                     Start
@@ -75,7 +82,9 @@ const OneDay = (props) => {
                     />
                 </label>
 
-                <Button type="submit" variant="contained">Count</Button>
+                <Button type="submit" variant="contained" style={{ textTransform: "none"}}>
+                    Save & Count
+                </Button>
             </Form>
         </Grid>
     )
