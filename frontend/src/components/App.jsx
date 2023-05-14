@@ -1,9 +1,12 @@
 import React from 'react';
+import Home from "./Home.jsx";
 
-export function App({ props }) {
+export function App() {
   return (
-    <div>
-      Webpack HMR Example change
-    </div>
+      <>
+        <Home/>
+      </>
   );
 }
+
+export default App

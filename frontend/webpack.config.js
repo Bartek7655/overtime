@@ -1,10 +1,16 @@
 const path = require('path')
 const webpack = require('webpack')
+const dotenv = require('dotenv')
+
+dotenv.config()
 
 module.exports = {
     mode:"development",
     plugins: [
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(process.env)
+        })
     ],
     entry: path.resolve(__dirname, 'src', 'index.jsx'),
     output: {
@@ -15,6 +21,7 @@ module.exports = {
         static:{
             directory: path.resolve(__dirname, 'dist'),
         },
+        historyApiFallback: true,
         open: true,
         hot: true,
         port: 3000
