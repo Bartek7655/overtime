@@ -2,28 +2,27 @@ import React from "react"
 
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
-import {required, email} from "../validators/validators.jsx";
+import {required, email} from "../../validators/validators.jsx";
 import {Button} from "@mui/material";
+import {useDispatch} from "react-redux";
 
-import axiosInstance from "../axios/axios";
+import {signIn} from "../../redux/slices/profileSlice";
+
 
 
 const SignIn = () => {
-    const login = (event) => {
+    const dispatch = useDispatch()
+
+    const signin = (event) => {
         event.preventDefault();
         const data = new FormData(event.target);
-        axiosInstance.post(
-            "account/signin/", data
-        ).then((response)=> {
-            localStorage.setItem("access_token", response.data.access);
-            localStorage.setItem("refresh_token", response.data.refresh);
-            window.location.replace('/');
-        })
-
+        dispatch(signIn(data)).unwrap()
+            .then(response => window.location.replace('/')
+            )
     }
 
     return (
-        <Form onSubmit={login}>
+        <Form onSubmit={signin}>
             <label>
                 Email
                 <Input

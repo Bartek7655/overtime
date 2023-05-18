@@ -1,9 +1,9 @@
 import React from "react"
 import Input from "react-validation/build/input";
-import {email, password_same, required} from "../validators/validators.jsx";
+import {email, password_same, required} from "../../validators/validators.jsx";
 import {Button} from "@mui/material";
 import Form from "react-validation/build/form";
-import axiosInstance from "../axios/axios";
+import axiosInstance from "../../axios/axios";
 import {useNavigate} from "react-router";
 
 const SignUp = () => {
