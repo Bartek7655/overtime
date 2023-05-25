@@ -9,7 +9,7 @@ from rest_framework_simplejwt.token_blacklist.models import (BlacklistedToken, O
 from .serializers import RegisterSerializer
 
 
-class RegisterView(CreateAPIView):
+class SignUpView(CreateAPIView):
     queryset = get_user_model().objects.all()
     permission_classes = (AllowAny, )
     serializer_class = RegisterSerializer
