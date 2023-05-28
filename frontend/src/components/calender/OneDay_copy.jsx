@@ -1,45 +1,11 @@
-import React, {useEffect, useState} from "react"
+import React from "react"
 import {Button, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import axiosInstance from "../../axios/axios";
-import {useDispatch, useSelector} from "react-redux";
-import {addNewDay} from "../../redux/slices/countOvertimeSlice";
 
 const OneDay = (props) => {
-    const {day, month, dayOfTheWeek, year} = props
-    const [time, setTime] = useState({})
-
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        if(time.end){
-            dispatch(addNewDay(time))
-        }
-    },[time])
-    const statex = useSelector(state=> state.notSavedOvertime)
-    console.log('statex', statex)
-
-    const handleInput = (event) => {
-        const date = `${day}.${month}.${year}`
-        const eventTime = event.target.value
-
-        if(event.target.name.includes('start')){
-            setTime({start: {
-                date: date,
-                time: eventTime
-            }})
-        }else{
-            setTime((prevState) => ({
-                ...prevState,
-                    end: {
-                            date: date,
-                            time: eventTime
-                        }
-                    }))
-        }
-    }
-
+    const {day, month, dayOfTheWeek} = props
 
     const convertStringToTime = (string) => {
         try{
@@ -58,7 +24,7 @@ const OneDay = (props) => {
         const difference_in_minutes = convert_milliseconds_to_minutes(end_time - start_time)
         const time_without_pause = subtract_pause(difference_in_minutes)
         axiosInstance.post('/api/type-overtime/', {
-            "date": `${day}.${month}.${year}`,
+            "date": `${day}.${month}.${new Date().getFullYear()}`,
             "overtime": difference_in_minutes
         })
         console.log(time_without_pause)
@@ -98,15 +64,14 @@ const OneDay = (props) => {
     }
 
     return(
-        <Grid item xs={2}>
-            {day}.{month} {dayOfTheWeek}
+        <Grid item>
+            {day}.{month+1} {dayOfTheWeek}
             <Form onSubmit={count}>
                 <label>
                     Start
                     <Input
                         type="time"
                         name={`start_day${day}`}
-                        onBlur={handleInput}
                     />
                 </label>
 
@@ -115,13 +80,12 @@ const OneDay = (props) => {
                     <Input
                         type="time"
                         name={`end_day${day}`}
-                        onBlur={handleInput}
                     />
                 </label>
 
-                {/*<Button type="submit" variant="contained" style={{ textTransform: "none"}}>*/}
-                {/*    Save & Count*/}
-                {/*</Button>*/}
+                <Button type="submit" variant="contained" style={{ textTransform: "none"}}>
+                    Save & Count
+                </Button>
             </Form>
         </Grid>
     )
