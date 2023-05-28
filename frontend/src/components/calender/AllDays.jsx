@@ -24,7 +24,7 @@ const AllDays = (props) => {
     const allDaysContent = (
         <Grid container spacing={3}>
                 {allDaysInMonth.map((day)=>{
-                    return <OneDay key={day.day} month={month} day={day.day} dayOfTheWeek={day.dayOfTheWeek}/>
+                    return <OneDay key={day.day} day={day.day} month={month+1} year={year} dayOfTheWeek={day.dayOfTheWeek}/>
                 })}
         </Grid>
     )

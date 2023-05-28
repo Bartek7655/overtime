@@ -33,5 +33,4 @@ class TestApi(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        print(request)
         return Response('test')
