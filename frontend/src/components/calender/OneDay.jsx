@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react"
 import {Button, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
-import axiosInstance from "../../axios/axios";
 import {useDispatch, useSelector} from "react-redux";
 import {addNewDay} from "../../redux/slices/countOvertimeSlice";
 
@@ -13,11 +12,19 @@ const OneDay = (props) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if(time.end){
-            dispatch(addNewDay(time))
+        if(time.start && time.end){
+            const overtime = count(time.start, time.end)
+            console.log("overtime", overtime)
+            dispatch(addNewDay(
+                {
+                    overtime: overtime,
+                    date: time.date
+                }
+            ))
         }
     },[time])
-    const statex = useSelector(state=> state.notSavedOvertime)
+
+    const statex = useSelector(state => state.notSavedOvertime)
     console.log('statex', statex)
 
     const handleInput = (event) => {
@@ -25,17 +32,14 @@ const OneDay = (props) => {
         const eventTime = event.target.value
 
         if(event.target.name.includes('start')){
-            setTime({start: {
+            setTime({
                 date: date,
-                time: eventTime
-            }})
+                start: eventTime
+            })
         }else{
             setTime((prevState) => ({
                 ...prevState,
-                    end: {
-                            date: date,
-                            time: eventTime
-                        }
+                    end: eventTime
                     }))
         }
     }
@@ -51,19 +55,14 @@ const OneDay = (props) => {
         }
     }
 
-    const count = (event) => {
-        event.preventDefault()
-        const data = new FormData(event.target)
-        const {start_time, end_time} = get_times(data)
+    const count = (start_time_string, end_time_string) => {
+        const start_time = convertStringToTime(start_time_string)
+        const end_time = convertStringToTime(end_time_string)
         const difference_in_minutes = convert_milliseconds_to_minutes(end_time - start_time)
         const time_without_pause = subtract_pause(difference_in_minutes)
-        axiosInstance.post('/api/type-overtime/', {
-            "date": `${day}.${month}.${year}`,
-            "overtime": difference_in_minutes
-        })
-        console.log(time_without_pause)
+        const overtime = subtract_eight_hours(time_without_pause)
+        return overtime
     }
-
 
     const get_times = (data) => {
         let start_time = data.get(`start_day${day}`)
@@ -75,6 +74,10 @@ const OneDay = (props) => {
 
     const set_time_object = (hours, minutes) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
+    }
+
+    const subtract_eight_hours = (working_time_in_minutes) => {
+        return working_time_in_minutes - 480
     }
 
     const subtract_pause = (difference_in_minutes) => {
