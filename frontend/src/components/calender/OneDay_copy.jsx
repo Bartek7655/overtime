@@ -1,49 +1,11 @@
-import React, {useEffect, useState} from "react"
+import React from "react"
 import {Button, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
-import {useDispatch, useSelector} from "react-redux";
-import {addNewDay} from "../../redux/slices/countOvertimeSlice";
+import axiosInstance from "../../axios/axios";
 
 const OneDay = (props) => {
-    const {day, month, dayOfTheWeek, year} = props
-    const [time, setTime] = useState({})
-
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        if(time.start && time.end){
-            const overtime = count(time.start, time.end)
-            console.log("overtime", overtime)
-            dispatch(addNewDay(
-                {
-                    overtime: overtime,
-                    date: time.date
-                }
-            ))
-        }
-    },[time])
-
-    const statex = useSelector(state => state.notSavedOvertime)
-    console.log('statex', statex)
-
-    const handleInput = (event) => {
-        const date = `${day}.${month}.${year}`
-        const eventTime = event.target.value
-
-        if(event.target.name.includes('start')){
-            setTime({
-                date: date,
-                start: eventTime
-            })
-        }else{
-            setTime((prevState) => ({
-                ...prevState,
-                    end: eventTime
-                    }))
-        }
-    }
-
+    const {day, month, dayOfTheWeek} = props
 
     const convertStringToTime = (string) => {
         try{
@@ -55,14 +17,19 @@ const OneDay = (props) => {
         }
     }
 
-    const count = (start_time_string, end_time_string) => {
-        const start_time = convertStringToTime(start_time_string)
-        const end_time = convertStringToTime(end_time_string)
+    const count = (event) => {
+        event.preventDefault()
+        const data = new FormData(event.target)
+        const {start_time, end_time} = get_times(data)
         const difference_in_minutes = convert_milliseconds_to_minutes(end_time - start_time)
         const time_without_pause = subtract_pause(difference_in_minutes)
-        const overtime = subtract_eight_hours(time_without_pause)
-        return overtime
+        axiosInstance.post('/api/type-overtime/', {
+            "date": `${day}.${month}.${new Date().getFullYear()}`,
+            "overtime": difference_in_minutes
+        })
+        console.log(time_without_pause)
     }
+
 
     const get_times = (data) => {
         let start_time = data.get(`start_day${day}`)
@@ -74,10 +41,6 @@ const OneDay = (props) => {
 
     const set_time_object = (hours, minutes) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
-    }
-
-    const subtract_eight_hours = (working_time_in_minutes) => {
-        return working_time_in_minutes - 480
     }
 
     const subtract_pause = (difference_in_minutes) => {
@@ -101,15 +64,14 @@ const OneDay = (props) => {
     }
 
     return(
-        <Grid item xs={2}>
-            {day}.{month} {dayOfTheWeek}
+        <Grid item>
+            {day}.{month+1} {dayOfTheWeek}
             <Form onSubmit={count}>
                 <label>
                     Start
                     <Input
                         type="time"
                         name={`start_day${day}`}
-                        onBlur={handleInput}
                     />
                 </label>
 
@@ -118,13 +80,12 @@ const OneDay = (props) => {
                     <Input
                         type="time"
                         name={`end_day${day}`}
-                        onBlur={handleInput}
                     />
                 </label>
 
-                {/*<Button type="submit" variant="contained" style={{ textTransform: "none"}}>*/}
-                {/*    Save & Count*/}
-                {/*</Button>*/}
+                <Button type="submit" variant="contained" style={{ textTransform: "none"}}>
+                    Save & Count
+                </Button>
             </Form>
         </Grid>
     )
