@@ -6,7 +6,16 @@ const notSavedOvertimeSlice = createSlice({
     initialState: [],
     reducers: {
         addNewDay: (state, action) => {
-            state.push(action.payload)
+            let changed
+            state.forEach(element => {
+                if(element.date === action.payload.date){
+                    element.overtime = action.payload.overtime
+                    changed = true
+                }
+            })
+            if(!changed){
+                state.push(action.payload)
+            }
         },
     },
 })
