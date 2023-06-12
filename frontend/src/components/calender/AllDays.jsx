@@ -6,14 +6,14 @@ import OneDay from "./OneDay.jsx";
 const AllDays = (props) => {
     const {year, month, day} = props
     const firstDayOfMonth = new Date(year,month , 1);
+    console.log(firstDayOfMonth)
     const lastDayOfMonth = new Date(year, month + 1, 0);
 
     let currentDay = firstDayOfMonth
     let allDaysInMonth = []
     while(currentDay <= lastDayOfMonth){
         // set the day's name of the week
-        let dayOfTheWeek = new Date(year, month, currentDay.getDay())
-            .toLocaleString("en-US", {weekday: "long"});
+        const dayOfTheWeek = currentDay.toLocaleString("en-US", {weekday: "long"});
         // add current day to the list
         allDaysInMonth.push(
             {"day": currentDay.getDate(), "dayOfTheWeek": dayOfTheWeek}
