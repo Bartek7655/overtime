@@ -1,9 +1,29 @@
 import {createSlice} from '@reduxjs/toolkit'
+import {createAsyncThunk} from "@reduxjs/toolkit";
+import axiosInstance from "../../axios/axios";
+
+export const uploadNotSavedOvertime = createAsyncThunk(
+    "overtime/upload",
+    async(data) => {
+        try{
+            const response = await axiosInstance.post('api/type-overtime/', data)
+            return response.data
+        } catch (error) {
+            console.log("Uploading overtime error: ", error.message)
+            throw error
+        }
+    }
+
+)
 
 
 const notSavedOvertimeSlice = createSlice({
     name: "notSavedOvertime",
-    initialState: [],
+    initialState: {
+        loading: true,
+        entities: [],
+        error: null
+    },
     reducers: {
         addNewDay: (state, action) => {
             let changed
@@ -18,6 +38,19 @@ const notSavedOvertimeSlice = createSlice({
             }
         },
     },
+    extraReducers:{
+        [uploadNotSavedOvertime.pending]: (state) => {
+            state.loading = true
+        },
+        [uploadNotSavedOvertime.fulfilled]: (state) => {
+            state.loading = false
+            state.entities = []
+        },
+        [uploadNotSavedOvertime.rejected]: (state, action) => {
+            state.loading = false
+            state.error = action.payload
+        }
+    }
 })
 
 export const {addNewDay} = notSavedOvertimeSlice.actions
