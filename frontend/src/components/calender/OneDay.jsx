@@ -15,7 +15,6 @@ const OneDay = (props) => {
     useEffect(() => {
         if(time.start && time.end){
             const overtime = count(time.start, time.end)
-            console.log("overtime", overtime)
             dispatch(addNewDay(
                 {
                     overtime: overtime,
@@ -77,7 +76,6 @@ const OneDay = (props) => {
 
     const isWeekend = () => {
         let checkWeekend = new Date(year, month, day).getDay()
-        console.log('checkWeekend', checkWeekend)
         return checkWeekend === 0 || checkWeekend === 6;
     }
 
@@ -134,9 +132,13 @@ const OneDay = (props) => {
                             />
                         </label>
 
-                        {/*<Button type="submit" variant="contained" style={{ textTransform: "none"}}>*/}
-                        {/*    Save & Count*/}
-                        {/*</Button>*/}
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            style={{ textTransform: "none"}}
+                        >
+                            Save
+                        </Button>
                     </Form>
                 </Grid>
 
