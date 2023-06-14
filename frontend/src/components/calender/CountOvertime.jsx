@@ -1,10 +1,13 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {Button, Grid, Typography} from "@mui/material";
 import AllDays from "./AllDays.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {uploadNotSavedOvertime} from "../../redux/slices/countOvertimeSlice";
 
 
 const CountOvertime = () => {
     const [month, setMonth] = useState(new Date().getMonth())
+    const dispatch = useDispatch()
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
@@ -13,6 +16,11 @@ const CountOvertime = () => {
     const day = new Date().getDate()
     //get month's name
     const monthName = monthNames[month]
+    const entities = useSelector(state => state.notSavedOvertime.entities)
+
+    useEffect(() => {
+        // entities = useSelector(state => state.notSavedOvertime.entities)
+    }, [])
 
     const handleButton = (event) => {
         if(event.target.name === 'next'){
@@ -20,6 +28,10 @@ const CountOvertime = () => {
         }else{
             setMonth(prevState => prevState - 1)
         }
+    }
+
+    const saveOverTime = () => {
+        dispatch(uploadNotSavedOvertime(entities))
     }
 
     return(
@@ -52,6 +64,15 @@ const CountOvertime = () => {
             </Grid>
             <Grid item>
                 <AllDays year={year} month={month} day={day}/>
+            </Grid>
+
+            <Grid item>
+                <Button
+                    variant="contained"
+                    onClick={saveOverTime}
+                >
+                    Save
+                </Button>
             </Grid>
         </Grid>
     )

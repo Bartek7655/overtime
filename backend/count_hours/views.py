@@ -15,6 +15,7 @@ class TypeOvertime(CreateAPIView):
     serializer_class = OvertimeSerializer
 
     def post(self, request, *args, **kwargs):
+        print('test')
 
         return super().post(request, *args, **kwargs)
 
@@ -33,12 +34,17 @@ class TypeOvertime(CreateAPIView):
             raise ValueError("Invalid date format")
 
     def create(self, request, *args, **kwargs):
-        data = {
-            "date": self.transform_date(self.request.data.get('date')),
-            "overtime": self.request.data.get('overtime'),
-            "user": self.request.user.id
-        }
-        serializer = self.get_serializer(data=data)
+        overtime_data = self.request.data
+        data_list = []
+        for item in overtime_data:
+            data = {
+                "date": self.transform_date(item['date']),
+                "overtime": item['overtime'],
+                "user": self.request.user.id
+            }
+            data_list.append(data)
+
+        serializer = self.get_serializer(data=data_list, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
