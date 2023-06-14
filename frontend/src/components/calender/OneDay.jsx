@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {Button, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
@@ -54,7 +54,7 @@ const OneDay = (props) => {
             timeWithoutPause = subtractEightHours(timeWithoutPause)
             setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
         }
-        return finishOvertime
+        return timeWithoutPause
     }
 
     const handleInput = (event) => {
@@ -131,14 +131,6 @@ const OneDay = (props) => {
                                 onBlur={handleInput}
                             />
                         </label>
-
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            style={{ textTransform: "none"}}
-                        >
-                            Save
-                        </Button>
                     </Form>
                 </Grid>
 
