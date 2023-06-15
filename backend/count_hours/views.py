@@ -14,10 +14,8 @@ class TypeOvertime(CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = OvertimeSerializer
 
-    def post(self, request, *args, **kwargs):
-        print('test')
-
-        return super().post(request, *args, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     return super().post(request, *args, **kwargs)
 
     @staticmethod
     def transform_date(date_string):
@@ -33,6 +31,17 @@ class TypeOvertime(CreateAPIView):
             # Handle any parsing errors or invalid date formats
             raise ValueError("Invalid date format")
 
+    def check_unique(self, data):
+        try:
+            created_object = self.model.objects.get(
+                user__id=data["user"],
+                date=data["date"]
+            )
+            return False, created_object
+
+        except Overtime.DoesNotExist:
+            return True, None
+
     def create(self, request, *args, **kwargs):
         overtime_data = self.request.data
         data_list = []
@@ -42,7 +51,13 @@ class TypeOvertime(CreateAPIView):
                 "overtime": item['overtime'],
                 "user": self.request.user.id
             }
-            data_list.append(data)
+            created, created_object = self.check_unique(data)
+            if created:
+                data_list.append(data)
+            else:
+                created_object.overtime = data['overtime']
+                created_object.save()
+
 
         serializer = self.get_serializer(data=data_list, many=True)
         serializer.is_valid(raise_exception=True)
