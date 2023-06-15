@@ -29,7 +29,12 @@ const OneDay = (props) => {
     }
 
     const convertOvertimeToShownString = (minutes) => {
-        return `${Math.floor(minutes / 60)} hours ${minutes % 60} minutes`
+        console.log('minutes', minutes)
+        if(minutes >= 60) {
+            return `${Math.floor(minutes / 60)} hours ${minutes % 60} minutes`
+        }else{
+            return `- 0 hours ${minutes % 60} minutes`
+        }
     }
 
     const convertStringToTime = (string) => {
@@ -47,7 +52,6 @@ const OneDay = (props) => {
         const endTime = convertStringToTime(endTimeString)
         const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime)
         let timeWithoutPause = subtract_pause(differenceInMinutes)
-
         if(isWeekend()){
             setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
         }else{
@@ -84,7 +88,8 @@ const OneDay = (props) => {
     }
 
     const subtractEightHours = (workingTimeInMinutes) => {
-        return workingTimeInMinutes - 480
+        const eightHours = 480
+        return workingTimeInMinutes - eightHours
     }
 
     const subtract_pause = (differenceInMinutes) => {
