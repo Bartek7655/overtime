@@ -46,7 +46,6 @@ class TestViews(APITestCase):
 
         self.assertEqual(response.status_code, 205)
 
-
     def test_refresh_token(self):
         client, response = (self.signin(self.client))
 

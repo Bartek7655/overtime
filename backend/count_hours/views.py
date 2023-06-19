@@ -27,6 +27,9 @@ class TypeOvertime(CreateAPIView):
         except ValueError:
             # Handle any parsing errors or invalid date formats
             raise ValueError("Invalid date format")
+        except AttributeError:
+            # No data - return code 400
+            pass
 
     def check_unique(self, data):
         try:

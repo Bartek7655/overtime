@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import AccessToken
 
-from ...count_hours.models import Overtime
+from count_hours.models import Overtime
 
 
 class TestViews(APITestCase):
@@ -18,6 +18,9 @@ class TestViews(APITestCase):
         self.token = AccessToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f"JWT {self.token}")
 
+    def send_overtime(self, data):
+        return self.client.post(reverse('type_overtime'), data=data, format="json")
+
     def test_add_overtime(self):
         data = [
             {
@@ -29,8 +32,27 @@ class TestViews(APITestCase):
                 "overtime": 200
             }
         ]
-        response = self.client.post(reverse('type_overtime'), data=data, format="json")
+        response = self.send_overtime(data)
         self.assertEqual(response.status_code, 201)
-        # all_objects = Overtime.objects.all()
-        # self.assertEqual(all_objects.count(), len(data))
 
+        all_objects = Overtime.objects.all()
+        self.assertEqual(all_objects.count(), len(data))
+
+    def test_add_overtime_fail(self):
+        data = [
+            {
+                "date": "12.11.2011",
+            }
+        ]
+
+        response = self.send_overtime(data)
+        self.assertEqual(response.status_code, 400)
+
+        data = [
+            {
+                "overtime": 300
+            }
+        ]
+
+        response = self.send_overtime(data)
+        self.assertEqual(response.status_code, 400)
