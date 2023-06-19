@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+
+import django
 from decouple import config
 from datetime import timedelta
 
@@ -56,11 +58,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
-    'count_hours',
     'rest_framework_simplejwt',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'count_hours.apps.CountHoursConfig',
+    'account.apps.AccountConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,10 +1,9 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient, APITestCase
 
 
-class TestViews(TestCase):
+class TestViews(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.password = 'testtest32113'
@@ -46,7 +45,6 @@ class TestViews(TestCase):
         response = client.post(reverse('signout'))
 
         self.assertEqual(response.status_code, 205)
-
 
     def test_refresh_token(self):
         client, response = (self.signin(self.client))

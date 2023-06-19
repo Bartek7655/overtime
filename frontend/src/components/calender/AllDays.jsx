@@ -6,7 +6,6 @@ import OneDay from "./OneDay.jsx";
 const AllDays = (props) => {
     const {year, month, day} = props
     const firstDayOfMonth = new Date(year,month , 1);
-    console.log(firstDayOfMonth)
     const lastDayOfMonth = new Date(year, month + 1, 0);
 
     let currentDay = firstDayOfMonth
