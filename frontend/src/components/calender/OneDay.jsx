@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from "react"
-import {Button, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {addNewDay} from "../../redux/slices/countOvertimeSlice";
 
 const OneDay = (props) => {
+    const [finishOvertime, setFinishOvertime] = useState('')
     const {day, month, dayOfTheWeek, year} = props
     const [time, setTime] = useState({})
-
     const dispatch = useDispatch()
+
 
     useEffect(() => {
         if(time.start && time.end){
             const overtime = count(time.start, time.end)
-            console.log("overtime", overtime)
             dispatch(addNewDay(
                 {
                     overtime: overtime,
@@ -24,8 +24,47 @@ const OneDay = (props) => {
         }
     },[time])
 
-    const statex = useSelector(state => state.notSavedOvertime)
-    console.log('statex', statex)
+    const convertMillisecondsToMinutes = (milliseconds) => {
+        return Math.floor(milliseconds/60000)
+    }
+
+    const convertOvertimeToShownString = (minutes) => {
+        if(minutes >= 60) {
+            return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
+        }else if(minutes < 0){
+            if(minutes <= -60){
+                return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
+            }else{
+                return`- 0 hours ${minutes % 60} minutes`
+            }
+        }else{
+            return `- 0 hours ${minutes % 60} minutes`
+        }
+    }
+
+    const convertStringToTime = (string) => {
+        try{
+            const [hours, minutes] = string.split(":")
+            return setTimeObject(hours, minutes)
+
+        }catch (error){
+            console.error("An error occurred: ", string)
+        }
+    }
+
+    const count = (startTimeString, endTimeString) => {
+        const startTime = convertStringToTime(startTimeString)
+        const endTime = convertStringToTime(endTimeString)
+        const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime)
+        let timeWithoutPause = subtract_pause(differenceInMinutes)
+        if(isWeekend()){
+            setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+        }else{
+            timeWithoutPause = subtractEightHours(timeWithoutPause)
+            setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+        }
+        return timeWithoutPause
+    }
 
     const handleInput = (event) => {
         const date = `${day}.${month}.${year}`
@@ -44,88 +83,71 @@ const OneDay = (props) => {
         }
     }
 
-
-    const convertStringToTime = (string) => {
-        try{
-            const [hours, minutes] = string.split(":")
-            return set_time_object(hours, minutes)
-
-        }catch (error){
-            console.error("An error occurred: ", string)
-        }
+    const isWeekend = () => {
+        let checkWeekend = new Date(year, month, day).getDay()
+        return checkWeekend === 0 || checkWeekend === 6;
     }
 
-    const count = (start_time_string, end_time_string) => {
-        const start_time = convertStringToTime(start_time_string)
-        const end_time = convertStringToTime(end_time_string)
-        const difference_in_minutes = convert_milliseconds_to_minutes(end_time - start_time)
-        const time_without_pause = subtract_pause(difference_in_minutes)
-        const overtime = subtract_eight_hours(time_without_pause)
-        return overtime
-    }
-
-    const get_times = (data) => {
-        let start_time = data.get(`start_day${day}`)
-        let end_time = data.get(`end_day${day}`)
-        start_time = convertStringToTime(start_time)
-        end_time = convertStringToTime(end_time)
-        return {start_time, end_time}
-    }
-
-    const set_time_object = (hours, minutes) => {
+    const setTimeObject = (hours, minutes) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
     }
 
-    const subtract_eight_hours = (working_time_in_minutes) => {
-        return working_time_in_minutes - 480
+    const subtractEightHours = (workingTimeInMinutes) => {
+        const eightHours = 480
+        return workingTimeInMinutes - eightHours
     }
 
-    const subtract_pause = (difference_in_minutes) => {
-        const twelve_hours = {"minutes": 720, "pause": 60}
-        const nine_hours = {"minutes": 540, "pause": 45}
-        const six_hours = {"minutes": 360, "pause" : 30}
+    const subtract_pause = (differenceInMinutes) => {
+        const twelveHours = {"minutes": 720, "pause": 15}
+        const nineHours = {"minutes": 540, "pause": 15}
+        const sixHours = {"minutes": 360, "pause" : 30}
 
-        if(difference_in_minutes >= twelve_hours.minutes){
-            return difference_in_minutes - twelve_hours.pause
-        }else if(difference_in_minutes >= nine_hours.minutes){
-            return difference_in_minutes - nine_hours.pause
-        }else if(difference_in_minutes >= six_hours.minutes){
-            return difference_in_minutes - six_hours.pause
-        }else{
-            return difference_in_minutes
+        if(differenceInMinutes >= sixHours.minutes){
+            differenceInMinutes = differenceInMinutes - sixHours.pause
         }
+        if(differenceInMinutes >= nineHours.minutes){
+            differenceInMinutes = differenceInMinutes - nineHours.pause
+        }
+        if(differenceInMinutes >= twelveHours.minutes){
+            differenceInMinutes = differenceInMinutes - twelveHours.pause
+        }
+        return differenceInMinutes
     }
 
-    const convert_milliseconds_to_minutes = (milliseconds) => {
-        return Math.floor(milliseconds/60000)
-    }
 
     return(
         <Grid item xs={2}>
-            {day}.{month} {dayOfTheWeek}
-            <Form onSubmit={count}>
-                <label>
-                    Start
-                    <Input
-                        type="time"
-                        name={`start_day${day}`}
-                        onBlur={handleInput}
-                    />
-                </label>
+            <Grid direction="column" container>
+                <Grid item xs={2}>
+                    {day}.{month+1} {dayOfTheWeek}
+                </Grid>
 
-                <label>
-                    End
-                    <Input
-                        type="time"
-                        name={`end_day${day}`}
-                        onBlur={handleInput}
-                    />
-                </label>
+                <Grid item xs={8}>
+                    <Form onSubmit={count}>
+                        <label>
+                            Start
+                            <Input
+                                type="time"
+                                name={`start_day${day}`}
+                                onBlur={handleInput}
+                            />
+                        </label>
 
-                {/*<Button type="submit" variant="contained" style={{ textTransform: "none"}}>*/}
-                {/*    Save & Count*/}
-                {/*</Button>*/}
-            </Form>
+                        <label>
+                            End
+                            <Input
+                                type="time"
+                                name={`end_day${day}`}
+                                onBlur={handleInput}
+                            />
+                        </label>
+                    </Form>
+                </Grid>
+
+                <Grid item xs={2} color={"red"}>
+                    {finishOvertime}
+                </Grid>
+            </Grid>
         </Grid>
     )
 }

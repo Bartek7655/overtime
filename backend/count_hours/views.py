@@ -14,10 +14,6 @@ class TypeOvertime(CreateAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = OvertimeSerializer
 
-    def post(self, request, *args, **kwargs):
-
-        return super().post(request, *args, **kwargs)
-
     @staticmethod
     def transform_date(date_string):
         try:
@@ -31,14 +27,38 @@ class TypeOvertime(CreateAPIView):
         except ValueError:
             # Handle any parsing errors or invalid date formats
             raise ValueError("Invalid date format")
+        except AttributeError:
+            # No data - return code 400
+            pass
+
+    def check_unique(self, data):
+        try:
+            created_object = self.model.objects.get(
+                user__id=data["user"],
+                date=data["date"]
+            )
+            return False, created_object
+
+        except Overtime.DoesNotExist:
+            return True, None
 
     def create(self, request, *args, **kwargs):
-        data = {
-            "date": self.transform_date(self.request.data.get('date')),
-            "overtime": self.request.data.get('overtime'),
-            "user": self.request.user.id
-        }
-        serializer = self.get_serializer(data=data)
+        overtime_data = self.request.data
+        data_list = []
+        for item in overtime_data:
+            data = {
+                "date": self.transform_date(item.get('date')),
+                "overtime": item.get('overtime'),
+                "user": self.request.user.id
+            }
+            created, created_object = self.check_unique(data)
+            if created:
+                data_list.append(data)
+            else:
+                created_object.overtime = data['overtime']
+                created_object.save()
+
+        serializer = self.get_serializer(data=data_list, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)

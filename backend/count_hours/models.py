@@ -6,3 +6,4 @@ class Overtime(models.Model):
     user = models.ForeignKey(get_user_model(), related_name="user", on_delete=models.CASCADE)
     overtime = models.IntegerField()
     date = models.DateField()
+

@@ -12,8 +12,7 @@ const AllDays = (props) => {
     let allDaysInMonth = []
     while(currentDay <= lastDayOfMonth){
         // set the day's name of the week
-        let dayOfTheWeek = new Date(year, month, currentDay.getDay())
-            .toLocaleString("en-US", {weekday: "long"});
+        const dayOfTheWeek = currentDay.toLocaleString("en-US", {weekday: "long"});
         // add current day to the list
         allDaysInMonth.push(
             {"day": currentDay.getDate(), "dayOfTheWeek": dayOfTheWeek}
@@ -24,7 +23,7 @@ const AllDays = (props) => {
     const allDaysContent = (
         <Grid container spacing={3}>
                 {allDaysInMonth.map((day)=>{
-                    return <OneDay key={day.day} day={day.day} month={month+1} year={year} dayOfTheWeek={day.dayOfTheWeek}/>
+                    return <OneDay key={day.day} day={day.day} month={month} year={year} dayOfTheWeek={day.dayOfTheWeek}/>
                 })}
         </Grid>
     )
