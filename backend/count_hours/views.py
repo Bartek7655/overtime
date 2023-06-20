@@ -1,5 +1,5 @@
 from datetime import date
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import OvertimeSerializer
@@ -63,3 +63,14 @@ class TypeOvertime(CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class GetOvertime(ListAPIView):
+    model = Overtime
+    permission_classes = (IsAuthenticated, )
+    serializer_class = OvertimeSerializer
+
+    def get_queryset(self):
+        queryset = self.model.objects.filter(user__id=self.request.user.id)
+        return queryset
+
