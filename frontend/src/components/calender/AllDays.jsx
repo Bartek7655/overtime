@@ -1,12 +1,21 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {Grid} from "@mui/material";
 import OneDay from "./OneDay.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {getOvertime} from "../../redux/slices/overtime/getOvertime";
 
 
 const AllDays = (props) => {
     const {year, month, day} = props
     const firstDayOfMonth = new Date(year,month , 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
+    const dispatch = useDispatch()
+    const entities = useSelector(state => state.getOvertime.entities)
+
+    useEffect(() => {
+        const test = month + 1
+        dispatch(getOvertime({ test , year}))
+    }, [month])
 
     let currentDay = firstDayOfMonth
     let allDaysInMonth = []

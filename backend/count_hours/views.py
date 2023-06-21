@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -70,7 +70,25 @@ class GetOvertime(ListAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = OvertimeSerializer
 
+    @staticmethod
+    def get_date_range(month, year):
+        first_day = datetime(year, month, 1)
+        if month == 12:
+            last_day = datetime(year, month, 31)
+        else:
+            last_day = datetime(year, month + 1, 1) - timedelta(days=1)
+        return first_day, last_day
+
     def get_queryset(self):
-        queryset = self.model.objects.filter(user__id=self.request.user.id)
+        month = self.kwargs.get('month', None)
+        year = self.kwargs.get('year', None)
+        if month and year:
+            first_day, last_day = self.get_date_range(month, year)
+            queryset = self.model.objects.filter(
+                user__id=self.request.user.id,
+                date__range=[first_day, last_day]
+            )
+        else:
+            queryset = self.model.objects.filter(user__id=self.request.user.id)
         return queryset
 

@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit'
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import axiosInstance from "../../axios/axios";
+import axiosInstance from "../../../axios/axios";
 
 export const uploadNotSavedOvertime = createAsyncThunk(
     "overtime/upload",
@@ -13,7 +13,6 @@ export const uploadNotSavedOvertime = createAsyncThunk(
             throw error
         }
     }
-
 )
 
 

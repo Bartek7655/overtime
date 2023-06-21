@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import {Button, Grid, Typography} from "@mui/material";
 import AllDays from "./AllDays.jsx";
 import {useDispatch, useSelector} from "react-redux";
-import {uploadNotSavedOvertime} from "../../redux/slices/countOvertimeSlice";
+import {uploadNotSavedOvertime} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 
 
 const CountOvertime = () => {
@@ -18,9 +18,6 @@ const CountOvertime = () => {
     const monthName = monthNames[month]
     const entities = useSelector(state => state.notSavedOvertime.entities)
 
-    useEffect(() => {
-        // entities = useSelector(state => state.notSavedOvertime.entities)
-    }, [])
 
     const handleButton = (event) => {
         if(event.target.name === 'next'){
