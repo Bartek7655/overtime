@@ -3,7 +3,7 @@ import {Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
-import {addNewDay} from "../../redux/slices/countOvertimeSlice";
+import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
@@ -67,7 +67,7 @@ const OneDay = (props) => {
     }
 
     const handleInput = (event) => {
-        const date = `${day}.${month}.${year}`
+        const date = `${day}.${month+1}.${year}`
         const eventTime = event.target.value
 
         if(event.target.name.includes('start')){
