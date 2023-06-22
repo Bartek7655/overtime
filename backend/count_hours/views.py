@@ -46,7 +46,10 @@ class TypeOvertime(CreateAPIView):
         overtime_data = self.request.data
         data_list = []
         for item in overtime_data:
+            print('item', item)
             data = {
+                "start_time": item.get('start_time'),
+                "end_time": item.get('end_time'),
                 "date": self.transform_date(item.get('date')),
                 "overtime": item.get('overtime'),
                 "user": self.request.user.id
