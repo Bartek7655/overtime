@@ -59,6 +59,8 @@ class TypeOvertime(CreateAPIView):
                 data_list.append(data)
             else:
                 created_object.overtime = data['overtime']
+                created_object.start_time = data['start_time']
+                created_object.end_time = data['end_time']
                 created_object.save()
 
         serializer = self.get_serializer(data=data_list, many=True)
