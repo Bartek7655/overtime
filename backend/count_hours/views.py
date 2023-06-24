@@ -18,11 +18,11 @@ class TypeOvertime(CreateAPIView):
     def transform_date(date_string):
         try:
             # Parse the date string into a datetime object
-            date_split = date_string.split('.')
+            date_split = date_string.split('-')
             date_obj = date(
-                int(date_split[2]),
+                int(date_split[0]),
                 int(date_split[1]),
-                int(date_split[0]))
+                int(date_split[2]))
             return date_obj
         except ValueError:
             # Handle any parsing errors or invalid date formats
@@ -46,7 +46,6 @@ class TypeOvertime(CreateAPIView):
         overtime_data = self.request.data
         data_list = []
         for item in overtime_data:
-            print('item', item)
             data = {
                 "start_time": item.get('start_time'),
                 "end_time": item.get('end_time'),
