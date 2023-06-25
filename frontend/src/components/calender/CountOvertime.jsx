@@ -60,7 +60,7 @@ const CountOvertime = () => {
 
             </Grid>
             <Grid item>
-                <AllDays year={year} month={month} day={day}/>
+                <AllDays year={year} month={month}/>
             </Grid>
 
             <Grid item>
