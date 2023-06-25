@@ -3,26 +3,58 @@ import {Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
-import {addNewDay} from "../../redux/slices/countOvertimeSlice";
+import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
-    const {day, month, dayOfTheWeek, year} = props
+    const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
-    const dispatch = useDispatch()
-
+    const [currentTime, setCurrentTime] = useState({
+        start_time: currentState.start_time,
+        end_time: currentState.end_time
+    })
 
     useEffect(() => {
-        if(time.start && time.end){
-            const overtime = count(time.start, time.end)
+        setCurrentTime(currentState)
+        if(currentState.overtime){
+            setFinishOvertime(
+                convertOvertimeToShownString(currentState.overtime)
+            )
+        }
+    },[currentState])
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        if(time.start_time && time.end_time){
+            const overtime = count(time.start_time, time.end_time)
             dispatch(addNewDay(
                 {
+                    start_time: time.start_time,
+                    end_time: time.end_time,
                     overtime: overtime,
                     date: time.date
                 }
             ))
         }
     },[time])
+
+    const changeCurrentState = (event) => {
+        const eventTime = event.target.value
+
+        if(event.target.name.includes('start')){
+            setCurrentTime((prevState) => ({
+                ...prevState,
+                start_time: eventTime
+            }))
+        }else{
+            setCurrentTime((prevState) => ({
+                ...prevState,
+                end_time: eventTime
+            }))
+        }
+
+    }
 
     const convertMillisecondsToMinutes = (milliseconds) => {
         return Math.floor(milliseconds/60000)
@@ -49,6 +81,7 @@ const OneDay = (props) => {
 
         }catch (error){
             console.error("An error occurred: ", string)
+            return null
         }
     }
 
@@ -67,18 +100,23 @@ const OneDay = (props) => {
     }
 
     const handleInput = (event) => {
-        const date = `${day}.${month}.${year}`
+        const date = `${year}-${month+1}-${day}`
         const eventTime = event.target.value
-
-        if(event.target.name.includes('start')){
+        if(currentState.overtime){
             setTime({
                 date: date,
-                start: eventTime
+                start_time: currentTime.start_time,
+                end_time: currentTime.end_time
             })
-        }else{
+        } else if(event.target.name.includes('start')){
+            setTime({
+                date: date,
+                start_time: eventTime
+            })
+        } else{
             setTime((prevState) => ({
                 ...prevState,
-                    end: eventTime
+                    end_time: eventTime
                     }))
         }
     }
@@ -130,6 +168,8 @@ const OneDay = (props) => {
                                 type="time"
                                 name={`start_day${day}`}
                                 onBlur={handleInput}
+                                onChange={changeCurrentState}
+                                value={currentTime.start_time}
                             />
                         </label>
 
@@ -139,6 +179,8 @@ const OneDay = (props) => {
                                 type="time"
                                 name={`end_day${day}`}
                                 onBlur={handleInput}
+                                onChange={changeCurrentState}
+                                value={currentTime.end_time}
                             />
                         </label>
                     </Form>

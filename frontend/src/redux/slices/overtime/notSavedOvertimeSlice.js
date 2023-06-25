@@ -1,6 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit'
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import axiosInstance from "../../axios/axios";
+import axiosInstance from "../../../axios/axios";
 
 export const uploadNotSavedOvertime = createAsyncThunk(
     "overtime/upload",
@@ -13,7 +13,6 @@ export const uploadNotSavedOvertime = createAsyncThunk(
             throw error
         }
     }
-
 )
 
 
@@ -30,6 +29,8 @@ const notSavedOvertimeSlice = createSlice({
             state.entities.forEach(element => {
                 if(element.date === action.payload.date){
                     element.overtime = action.payload.overtime
+                    element.start_time = action.payload.start_time
+                    element.end_time = action.payload.end_time
                     changed = true
                 }
             })
@@ -38,18 +39,19 @@ const notSavedOvertimeSlice = createSlice({
             }
         },
     },
-    extraReducers:{
-        [uploadNotSavedOvertime.pending]: (state) => {
-            state.loading = true
-        },
-        [uploadNotSavedOvertime.fulfilled]: (state) => {
-            state.loading = false
-            state.entities = []
-        },
-        [uploadNotSavedOvertime.rejected]: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        }
+    extraReducers: (builder) => {
+        builder
+            .addCase(uploadNotSavedOvertime.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(uploadNotSavedOvertime.fulfilled, (state, action) => {
+                state.loading = false;
+                // state.entities = action.payload;
+            })
+            .addCase(uploadNotSavedOvertime.rejected, (state, action) => {
+                state.loading = false;
+                state.entities = action.payload
+            })
     }
 })
 
