@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {Grid} from "@mui/material";
+import {Button, Checkbox, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
@@ -9,6 +9,7 @@ const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
     const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
+    const [disableWeekend, setDisableWeekend] = useState(true)
     const [currentTime, setCurrentTime] = useState({
         start_time: currentState.start_time,
         end_time: currentState.end_time
@@ -16,12 +17,30 @@ const OneDay = (props) => {
 
     useEffect(() => {
         setCurrentTime(currentState)
-        if(currentState.overtime){
+        if(currentState.overtime || currentState.overtime === 0){
             setFinishOvertime(
                 convertOvertimeToShownString(currentState.overtime)
             )
         }
+
+        // check if is weekend and overtime too - to show saturday/sunday
+
+        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
+            setDisableWeekend(false)
+        }
+
     },[currentState])
+
+    useEffect(() => {
+        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
+            setDisableWeekend(false)
+            console.log()
+        }else{
+            console.log("isWeekend", isWeekend())
+            console.log('currentState.overtime', currentState.overtime)
+            console.log("!disableWeekend", disableWeekend)
+        }
+    }, [month])
 
     const dispatch = useDispatch()
 
@@ -70,7 +89,7 @@ const OneDay = (props) => {
                 return`- 0 hours ${minutes % 60} minutes`
             }
         }else{
-            return `- 0 hours ${minutes % 60} minutes`
+            return `0 hours ${minutes % 60} minutes`
         }
     }
 
@@ -102,7 +121,7 @@ const OneDay = (props) => {
     const handleInput = (event) => {
         const date = `${year}-${month+1}-${day}`
         const eventTime = event.target.value
-        if(currentState.overtime){
+        if(currentState.overtime || currentState.overtime === 0){
             setTime({
                 date: date,
                 start_time: currentTime.start_time,
@@ -130,6 +149,7 @@ const OneDay = (props) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
     }
 
+
     const subtractEightHours = (workingTimeInMinutes) => {
         const eightHours = 480
         return workingTimeInMinutes - eightHours
@@ -153,6 +173,10 @@ const OneDay = (props) => {
     }
 
 
+      const toggleFormExpand = () => {
+        setDisableWeekend((prevState) => !prevState)
+      };
+
     return(
         <Grid item xs={2}>
             <Grid direction="column" container>
@@ -161,6 +185,7 @@ const OneDay = (props) => {
                 </Grid>
 
                 <Grid item xs={8}>
+                    {!disableWeekend && (
                     <Form onSubmit={count}>
                         <label>
                             Start
@@ -184,6 +209,15 @@ const OneDay = (props) => {
                             />
                         </label>
                     </Form>
+                    )}
+                    {disableWeekend && (
+                        <Button
+                            onClick={toggleFormExpand}
+                            variant="contained"
+                        >
+                          {dayOfTheWeek}
+                        </Button>
+                      )}
                 </Grid>
 
                 <Grid item xs={2} color={"red"}>
