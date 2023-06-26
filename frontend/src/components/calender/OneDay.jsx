@@ -22,7 +22,6 @@ const OneDay = (props) => {
                 convertOvertimeToShownString(currentState.overtime)
             )
         }
-
         // check if is weekend and overtime too - to show saturday/sunday
 
         if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
@@ -30,17 +29,6 @@ const OneDay = (props) => {
         }
 
     },[currentState])
-
-    useEffect(() => {
-        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
-            setDisableWeekend(false)
-            console.log()
-        }else{
-            console.log("isWeekend", isWeekend())
-            console.log('currentState.overtime', currentState.overtime)
-            console.log("!disableWeekend", disableWeekend)
-        }
-    }, [month])
 
     const dispatch = useDispatch()
 
