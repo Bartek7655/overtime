@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {Grid} from "@mui/material";
+import {Button, Checkbox, Grid} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
@@ -7,22 +7,73 @@ import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
-    const {day, month, dayOfTheWeek, year} = props
+    const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
-    const dispatch = useDispatch()
-
+    const [disableWeekend, setDisableWeekend] = useState(true)
+    const [currentTime, setCurrentTime] = useState({
+        start_time: currentState.start_time,
+        end_time: currentState.end_time
+    })
 
     useEffect(() => {
-        if(time.start && time.end){
-            const overtime = count(time.start, time.end)
+        setCurrentTime(currentState)
+        if(currentState.overtime || currentState.overtime === 0){
+            setFinishOvertime(
+                convertOvertimeToShownString(currentState.overtime)
+            )
+        }
+
+        // check if is weekend and overtime too - to show saturday/sunday
+
+        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
+            setDisableWeekend(false)
+        }
+
+    },[currentState])
+
+    useEffect(() => {
+        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
+            setDisableWeekend(false)
+            console.log()
+        }else{
+            console.log("isWeekend", isWeekend())
+            console.log('currentState.overtime', currentState.overtime)
+            console.log("!disableWeekend", disableWeekend)
+        }
+    }, [month])
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        if(time.start_time && time.end_time){
+            const overtime = count(time.start_time, time.end_time)
             dispatch(addNewDay(
                 {
+                    start_time: time.start_time,
+                    end_time: time.end_time,
                     overtime: overtime,
                     date: time.date
                 }
             ))
         }
     },[time])
+
+    const changeCurrentState = (event) => {
+        const eventTime = event.target.value
+
+        if(event.target.name.includes('start')){
+            setCurrentTime((prevState) => ({
+                ...prevState,
+                start_time: eventTime
+            }))
+        }else{
+            setCurrentTime((prevState) => ({
+                ...prevState,
+                end_time: eventTime
+            }))
+        }
+
+    }
 
     const convertMillisecondsToMinutes = (milliseconds) => {
         return Math.floor(milliseconds/60000)
@@ -38,7 +89,7 @@ const OneDay = (props) => {
                 return`- 0 hours ${minutes % 60} minutes`
             }
         }else{
-            return `- 0 hours ${minutes % 60} minutes`
+            return `0 hours ${minutes % 60} minutes`
         }
     }
 
@@ -49,6 +100,7 @@ const OneDay = (props) => {
 
         }catch (error){
             console.error("An error occurred: ", string)
+            return null
         }
     }
 
@@ -67,18 +119,23 @@ const OneDay = (props) => {
     }
 
     const handleInput = (event) => {
-        const date = `${day}.${month+1}.${year}`
+        const date = `${year}-${month+1}-${day}`
         const eventTime = event.target.value
-
-        if(event.target.name.includes('start')){
+        if(currentState.overtime || currentState.overtime === 0){
             setTime({
                 date: date,
-                start: eventTime
+                start_time: currentTime.start_time,
+                end_time: currentTime.end_time
             })
-        }else{
+        } else if(event.target.name.includes('start')){
+            setTime({
+                date: date,
+                start_time: eventTime
+            })
+        } else{
             setTime((prevState) => ({
                 ...prevState,
-                    end: eventTime
+                    end_time: eventTime
                     }))
         }
     }
@@ -91,6 +148,7 @@ const OneDay = (props) => {
     const setTimeObject = (hours, minutes) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
     }
+
 
     const subtractEightHours = (workingTimeInMinutes) => {
         const eightHours = 480
@@ -115,6 +173,10 @@ const OneDay = (props) => {
     }
 
 
+      const toggleFormExpand = () => {
+        setDisableWeekend((prevState) => !prevState)
+      };
+
     return(
         <Grid item xs={2}>
             <Grid direction="column" container>
@@ -123,6 +185,7 @@ const OneDay = (props) => {
                 </Grid>
 
                 <Grid item xs={8}>
+                    {!disableWeekend && (
                     <Form onSubmit={count}>
                         <label>
                             Start
@@ -130,6 +193,8 @@ const OneDay = (props) => {
                                 type="time"
                                 name={`start_day${day}`}
                                 onBlur={handleInput}
+                                onChange={changeCurrentState}
+                                value={currentTime.start_time}
                             />
                         </label>
 
@@ -139,9 +204,20 @@ const OneDay = (props) => {
                                 type="time"
                                 name={`end_day${day}`}
                                 onBlur={handleInput}
+                                onChange={changeCurrentState}
+                                value={currentTime.end_time}
                             />
                         </label>
                     </Form>
+                    )}
+                    {disableWeekend && (
+                        <Button
+                            onClick={toggleFormExpand}
+                            variant="contained"
+                        >
+                          {dayOfTheWeek}
+                        </Button>
+                      )}
                 </Grid>
 
                 <Grid item xs={2} color={"red"}>

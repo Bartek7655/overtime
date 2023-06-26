@@ -5,7 +5,7 @@ export const getOvertime = createAsyncThunk(
     "overtime/get",
     async(data) => {
         try{
-            const response = await axiosInstance.get(`api/get-overtime/${data.test}/${data.year}/`)
+            const response = await axiosInstance.get(`api/get-overtime/${data.monthToFetch}/${data.year}/`)
             return response.data
         } catch (error) {
             console.log("Getting overtime error: ", error.message)
@@ -22,19 +22,24 @@ const getOvertimeSlice = createSlice({
         entities: null,
         error: null
     },
-    reducers: {},
-    extraReducers: {
-        [getOvertime.pending]: (state) => {
-            state.loading = true
-        },
-        [getOvertime.fulfilled]: (state, action) => {
-            state.loading = false
-            state.entities = action.payload
-        },
-        [getOvertime.rejected]: (state, action) => {
-            state.loading = false
-            state.error = action.payload
-        }
+    reducers: {
+        // addNewDay: (state, action) => {
+        //     state.entities.push(action.payload)
+        // }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(getOvertime.pending, (state) => {
+            state.loading = true;
+            })
+            .addCase(getOvertime.fulfilled, (state, action) => {
+                state.loading = false;
+                state.entities = action.payload;
+            })
+            .addCase(getOvertime.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 })
 
