@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React, {useEffect, useState} from "react"
 import {Grid} from "@mui/material";
 import OneDay from "./OneDay.jsx";
 import {useDispatch, useSelector} from "react-redux";
@@ -15,8 +15,8 @@ const AllDays = (props) => {
 
 
     useEffect(() => {
-        const test = month + 1
-        dispatch(getOvertime({ test , year}))
+        const monthToFetch = month + 1
+        dispatch(getOvertime({monthToFetch , year}))
     }, [month])
 
 
@@ -60,14 +60,16 @@ const AllDays = (props) => {
     const allDaysContent = (
         <Grid container spacing={3}>
                 {allDaysInMonth.map((day)=>{
-                    return <OneDay
-                        key={day.day}
-                        day={day.day}
-                        month={month}
-                        year={year}
-                        dayOfTheWeek={day.dayOfTheWeek}
-                        currentState={day.currentState}
-                    />
+                    return(
+                        <OneDay
+                            key={day.day}
+                            day={day.day}
+                            month={month}
+                            year={year}
+                            dayOfTheWeek={day.dayOfTheWeek}
+                            currentState={day.currentState}
+                        />
+                    )
                 })}
         </Grid>
     )

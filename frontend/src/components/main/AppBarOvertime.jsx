@@ -23,6 +23,9 @@ const settings = {
 if(loged()){
     settings['Type Overtime'] = '/countovertime'
     settings['Sign Out'] = '/signout'
+}else{
+    settings['Sign In'] = '/signin'
+    settings['Sign Up'] = '/signup'
 }
 
 const AppBarOvertime = () => {
