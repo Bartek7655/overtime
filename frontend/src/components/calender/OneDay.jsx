@@ -25,9 +25,8 @@ const OneDay = (props) => {
         }else{
             setFinishOvertime('')
         }
-
         // check if is weekend and overtime too - to show saturday/sunday
-
+      
         if(!isWeekend() || (isWeekend() && currentState.overtime)){
             setDisableDay(false)
         }else{
@@ -35,6 +34,7 @@ const OneDay = (props) => {
         }
 
     },[currentState, month])
+
 
     const dispatch = useDispatch()
 
