@@ -4,12 +4,13 @@ import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
 import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
+import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
     const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
-    const [disableWeekend, setDisableWeekend] = useState(true)
+    const [disableDay, setDisableDay] = useState(true)
     const [currentTime, setCurrentTime] = useState({
         start_time: currentState.start_time,
         end_time: currentState.end_time
@@ -21,26 +22,19 @@ const OneDay = (props) => {
             setFinishOvertime(
                 convertOvertimeToShownString(currentState.overtime)
             )
+        }else{
+            setFinishOvertime('')
         }
 
         // check if is weekend and overtime too - to show saturday/sunday
 
-        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
-            setDisableWeekend(false)
-        }
-
-    },[currentState])
-
-    useEffect(() => {
-        if(!isWeekend() || (isWeekend() && currentState.overtime || !disableWeekend)){
-            setDisableWeekend(false)
-            console.log()
+        if(!isWeekend() || (isWeekend() && currentState.overtime)){
+            setDisableDay(false)
         }else{
-            console.log("isWeekend", isWeekend())
-            console.log('currentState.overtime', currentState.overtime)
-            console.log("!disableWeekend", disableWeekend)
+            setDisableDay(true)
         }
-    }, [month])
+
+    },[currentState, month])
 
     const dispatch = useDispatch()
 
@@ -79,19 +73,7 @@ const OneDay = (props) => {
         return Math.floor(milliseconds/60000)
     }
 
-    const convertOvertimeToShownString = (minutes) => {
-        if(minutes >= 60) {
-            return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
-        }else if(minutes < 0){
-            if(minutes <= -60){
-                return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
-            }else{
-                return`- 0 hours ${minutes % 60} minutes`
-            }
-        }else{
-            return `0 hours ${minutes % 60} minutes`
-        }
-    }
+
 
     const convertStringToTime = (string) => {
         try{
@@ -174,7 +156,7 @@ const OneDay = (props) => {
 
 
       const toggleFormExpand = () => {
-        setDisableWeekend((prevState) => !prevState)
+        setDisableDay((prevState) => !prevState)
       };
 
     return(
@@ -184,8 +166,8 @@ const OneDay = (props) => {
                     {day}.{month+1} {dayOfTheWeek}
                 </Grid>
 
-                <Grid item xs={8}>
-                    {!disableWeekend && (
+                <Grid item xs={6}>
+                    {!disableDay && (
                     <Form onSubmit={count}>
                         <label>
                             Start
@@ -210,7 +192,7 @@ const OneDay = (props) => {
                         </label>
                     </Form>
                     )}
-                    {disableWeekend && (
+                    {disableDay && (
                         <Button
                             onClick={toggleFormExpand}
                             variant="contained"
@@ -222,6 +204,15 @@ const OneDay = (props) => {
 
                 <Grid item xs={2} color={"red"}>
                     {finishOvertime}
+                </Grid>
+
+                <Grid item xs={2}>
+                    <Button
+                        onClick={toggleFormExpand}
+                        variant="contained"
+                    >
+                        Holiday
+                    </Button>
                 </Grid>
             </Grid>
         </Grid>

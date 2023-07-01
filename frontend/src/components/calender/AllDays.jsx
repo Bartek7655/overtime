@@ -20,6 +20,7 @@ const AllDays = (props) => {
     }, [month])
 
 
+
     let currentDay = firstDayOfMonth
     let allDaysInMonth = []
 

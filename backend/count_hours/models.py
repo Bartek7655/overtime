@@ -8,4 +8,6 @@ class Overtime(models.Model):
     end_time = models.TimeField()
     overtime = models.IntegerField()
     date = models.DateField()
+    sickness = models.BooleanField(default=False)
+    holiday = models.BooleanField(default=False)
 
