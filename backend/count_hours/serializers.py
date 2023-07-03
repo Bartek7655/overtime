@@ -6,4 +6,4 @@ class OvertimeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Overtime
-        fields = ('overtime', 'date', "user", "start_time", "end_time")
+        fields = ('overtime', 'date', "user", "start_time", "end_time", "holiday", "sickness")
