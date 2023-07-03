@@ -51,6 +51,8 @@ class TypeOvertime(CreateAPIView):
                 "end_time": item.get('end_time'),
                 "date": self.transform_date(item.get('date')),
                 "overtime": item.get('overtime'),
+                "sickness": item.get('sickness'),
+                "holiday": item.get('holiday'),
                 "user": self.request.user.id
             }
             created, created_object = self.check_unique(data)
@@ -60,6 +62,8 @@ class TypeOvertime(CreateAPIView):
                 created_object.overtime = data['overtime']
                 created_object.start_time = data['start_time']
                 created_object.end_time = data['end_time']
+                created_object.end_time = data['sickness']
+                created_object.end_time = data['holiday']
                 created_object.save()
 
         serializer = self.get_serializer(data=data_list, many=True)

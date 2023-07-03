@@ -8,6 +8,8 @@ import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
+    const [sickness, setSickness] = useState(false)
+    const [holiday, setHoliday] = useState(false)
     const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
     const [disableDay, setDisableDay] = useState(true)
@@ -22,19 +24,26 @@ const OneDay = (props) => {
             setFinishOvertime(
                 convertOvertimeToShownString(currentState.overtime)
             )
+            setSickness(currentState.sickness)
+            setHoliday(currentState.holiday)
         }else{
             setFinishOvertime('')
         }
 
         // check if is weekend and overtime too - to show saturday/sunday
 
-        if(!isWeekend() || (isWeekend() && currentState.overtime)){
+        if(
+            !isWeekend() ||
+            (isWeekend() && currentState.overtime)
+            // holiday ||
+            // sickness
+        ){
             setDisableDay(false)
         }else{
             setDisableDay(true)
         }
 
-    },[currentState, month])
+    },[currentState, month, holiday, sickness])
 
     const dispatch = useDispatch()
 
@@ -46,6 +55,8 @@ const OneDay = (props) => {
                     start_time: time.start_time,
                     end_time: time.end_time,
                     overtime: overtime,
+                    holiday: holiday,
+                    sickness: sickness,
                     date: time.date
                 }
             ))
@@ -208,7 +219,13 @@ const OneDay = (props) => {
 
                 <Grid item xs={2}>
                     <Button
-                        onClick={toggleFormExpand}
+                        onClick={() => setSickness(prev => !prev)}
+                        variant="contained"
+                    >
+                        Sickness
+                    </Button>
+                    <Button
+                        onClick={() => setHoliday(prev => !prev)}
                         variant="contained"
                     >
                         Holiday
