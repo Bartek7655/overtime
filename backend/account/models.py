@@ -38,7 +38,7 @@ class User(AbstractUser):
         unique=True
     )
     is_active = models.BooleanField(
-        default=False
+        default=True
     )
 
     USERNAME_FIELD = "email"
