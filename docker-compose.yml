@@ -13,7 +13,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - 127.0.0.1:8000:8000
+      - 127.0.0.1:8001:8000
     networks:
       - overtime_network
     depends_on:
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./frontend:/app
     ports:
-      - 127.0.0.1:3000:3000
+      - 127.0.0.1:3001:3001
     depends_on:
       - backend
     networks:
@@ -50,7 +50,7 @@ services:
     volumes:
     - pgdata:/var/lib/postgresql/data
     ports:
-      - 127.0.0.1:5433:5432
+      - 127.0.0.1:5434:5432
     networks:
       - overtime_network
 

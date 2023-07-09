@@ -5,16 +5,18 @@ import store from "./redux/store";
 import {BrowserRouter} from "react-router-dom";
 import Routers from "./components/routers/Routers.jsx";
 import App from "./components/App.jsx";
+import {ThemeProvider} from "@mui/material";
+import theme from "./components/theme/theme";
 
 if (module.hot) module.hot.accept();
 
 const root = ReactDOM.createRoot(document.getElementById('app'))
 
 root.render(
-    <Provider store={store}>
-        <BrowserRouter>
-            <App/>
-            <Routers/>
-        </BrowserRouter>
-    </Provider>
+        <Provider store={store}>
+            <BrowserRouter>
+                <App/>
+                <Routers/>
+            </BrowserRouter>
+        </Provider>
 );

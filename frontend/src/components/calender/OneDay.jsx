@@ -1,43 +1,85 @@
 import React, {useEffect, useState} from "react"
-import {Grid} from "@mui/material";
+import {Button, Grid, Typography} from "@mui/material";
 import Form from "react-validation/build/form"
 import Input from "react-validation/build/input"
 import {useDispatch} from "react-redux";
 import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
+import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 
 const OneDay = (props) => {
     const [finishOvertime, setFinishOvertime] = useState('')
+    const [sickness, setSickness] = useState(false)
+    const [holiday, setHoliday] = useState(false)
+    const [somethingChanged, setSomethingChanged] = useState(false)
     const {day, month, year, dayOfTheWeek, currentState} = props
     const [time, setTime] = useState({})
+    const [offDay, setOffDay] = useState(true)
     const [currentTime, setCurrentTime] = useState({
-        start_time: currentState.start_time,
-        end_time: currentState.end_time
+        start_time: '',
+        end_time: ''
     })
 
     useEffect(() => {
-        setCurrentTime(currentState)
         if(currentState.overtime){
             setFinishOvertime(
                 convertOvertimeToShownString(currentState.overtime)
             )
+        }else{
+            setFinishOvertime('')
         }
+
+        if(
+            currentTime.start_time !== currentState.start_time ||
+            currentTime.end_time !== currentState.end_time
+        ){
+            // The following conditions are made to avoid changing the value from an empty string to null.
+            setCurrentTime(
+            {
+                start_time: currentState.start_time ? currentState.start_time : '',
+                end_time: currentState.end_time ? currentState.end_time : '',
+            }
+        )}
+        if(sickness !== currentState.sickness){
+            setSickness(currentState.sickness)
+        }
+        if (holiday !== currentState.holiday){
+            setHoliday(currentState.holiday)
+        }
+
     },[currentState])
+
+    useEffect(() => {
+        checkOffDay()
+    },[month, sickness, holiday])
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-        if(time.start_time && time.end_time){
-            const overtime = count(time.start_time, time.end_time)
-            dispatch(addNewDay(
-                {
-                    start_time: time.start_time,
-                    end_time: time.end_time,
-                    overtime: overtime,
-                    date: time.date
-                }
-            ))
+        if(
+            somethingChanged &&
+            (time.start_time ||
+            time.end_time ||
+            checkPreviousFulfilled() ||
+            currentState.sickness !== sickness ||
+            currentState.holiday !== holiday)
+        ){
+            addNotSavedDay()
         }
-    },[time])
+    },[time, sickness, holiday])
+
+    const addNotSavedDay = () => {
+        const overtime = count(time.start_time, time.end_time)
+        dispatch(addNewDay(
+            {
+                start_time: time.start_time,
+                end_time: time.end_time,
+                overtime: overtime,
+                holiday: holiday,
+                sickness: sickness,
+                date: setCurrentDate()
+            }
+        ))
+    }
 
     const changeCurrentState = (event) => {
         const eventTime = event.target.value
@@ -56,22 +98,25 @@ const OneDay = (props) => {
 
     }
 
-    const convertMillisecondsToMinutes = (milliseconds) => {
-        return Math.floor(milliseconds/60000)
+    const checkOffDay = () => {
+        if(
+            (isWeekend() && !currentState.overtime) ||
+            sickness ||
+            holiday
+        ){
+            setOffDay(true)
+        }else{
+            setOffDay(false)
+        }
     }
 
-    const convertOvertimeToShownString = (minutes) => {
-        if(minutes >= 60) {
-            return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
-        }else if(minutes < 0){
-            if(minutes <= -60){
-                return `${Math.trunc(minutes / 60)} hours ${minutes % 60} minutes`
-            }else{
-                return`- 0 hours ${minutes % 60} minutes`
-            }
-        }else{
-            return `- 0 hours ${minutes % 60} minutes`
-        }
+    const checkPreviousFulfilled = () => {
+        return !!currentState.start_time || !!currentState.end_time ||
+            currentState.sickness || currentState.holiday
+    }
+
+    const convertMillisecondsToMinutes = (milliseconds) => {
+        return Math.floor(milliseconds/60000)
     }
 
     const convertStringToTime = (string) => {
@@ -86,31 +131,34 @@ const OneDay = (props) => {
     }
 
     const count = (startTimeString, endTimeString) => {
-        const startTime = convertStringToTime(startTimeString)
-        const endTime = convertStringToTime(endTimeString)
-        const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime)
-        let timeWithoutPause = subtract_pause(differenceInMinutes)
-        if(isWeekend()){
-            setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+        if(startTimeString && endTimeString) {
+            const startTime = convertStringToTime(startTimeString)
+            const endTime = convertStringToTime(endTimeString)
+            const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime)
+            let timeWithoutPause = subtract_pause(differenceInMinutes)
+            if(isWeekend()){
+                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+            }else{
+                timeWithoutPause = subtractEightHours(timeWithoutPause)
+                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+            }
+            return timeWithoutPause
         }else{
-            timeWithoutPause = subtractEightHours(timeWithoutPause)
-            setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+            return null
         }
-        return timeWithoutPause
     }
 
+
     const handleInput = (event) => {
-        const date = `${year}-${month+1}-${day}`
+        setSomethingChanged(true)
         const eventTime = event.target.value
-        if(currentState.overtime){
+        if(checkPreviousFulfilled()){
             setTime({
-                date: date,
                 start_time: currentTime.start_time,
                 end_time: currentTime.end_time
             })
         } else if(event.target.name.includes('start')){
             setTime({
-                date: date,
                 start_time: eventTime
             })
         } else{
@@ -129,6 +177,11 @@ const OneDay = (props) => {
     const setTimeObject = (hours, minutes) => {
         return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
     }
+
+    const setCurrentDate = () => {
+        return `${year}-${month+1}-${day}`
+    }
+
 
     const subtractEightHours = (workingTimeInMinutes) => {
         const eightHours = 480
@@ -153,14 +206,21 @@ const OneDay = (props) => {
     }
 
 
+      const showDay = () => {
+        setOffDay((prevState) => !prevState)
+      };
+
     return(
         <Grid item xs={2}>
             <Grid direction="column" container>
                 <Grid item xs={2}>
-                    {day}.{month+1} {dayOfTheWeek}
+                    <Typography>
+                        {day}.{month+1}.{year} {dayOfTheWeek}
+                    </Typography>
                 </Grid>
 
-                <Grid item xs={8}>
+                <Grid item xs={6}>
+                    {!offDay && (
                     <Form onSubmit={count}>
                         <label>
                             Start
@@ -184,10 +244,45 @@ const OneDay = (props) => {
                             />
                         </label>
                     </Form>
+                    )}
+                    {offDay && (
+                        <Button
+                            size="small"
+                            onClick={showDay}
+                            variant="contained"
+                        >
+                          Type {dayOfTheWeek}
+                        </Button>
+                      )}
                 </Grid>
 
-                <Grid item xs={2} color={"red"}>
+                <Grid item xs={2} color={"purple"}>
                     {finishOvertime}
+                </Grid>
+
+                <Grid item xs={2}>
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        onClick={() => {
+                            setSickness(prev => !prev)
+                            setSomethingChanged(true)
+                        }}
+                    >
+                        Sickness
+                    </Button>
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        onClick={() => {
+                            setHoliday(prev => !prev)
+                            setSomethingChanged(true)
+                        }}
+                    >
+                        Holiday
+                    </Button>
                 </Grid>
             </Grid>
         </Grid>

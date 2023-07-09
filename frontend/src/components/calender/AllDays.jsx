@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React, {useEffect, useState} from "react"
 import {Grid} from "@mui/material";
 import OneDay from "./OneDay.jsx";
 import {useDispatch, useSelector} from "react-redux";
@@ -15,18 +15,21 @@ const AllDays = (props) => {
 
 
     useEffect(() => {
-        const test = month + 1
-        dispatch(getOvertime({ test , year}))
+        const monthToFetch = month + 1
+        dispatch(getOvertime({monthToFetch , year}))
     }, [month])
+
 
 
     let currentDay = firstDayOfMonth
     let allDaysInMonth = []
 
-    const checkDayFulfilled = (dayNumber) => {
+    const getPreviousState = (dayNumber) => {
         let fulfilledDay = {
             start_time: '',
-            end_time: ''
+            end_time: '',
+            sickness: false,
+            holiday: false
         }
         if (overtimeFromDatabase){
             overtimeFromDatabase.forEach(day => {
@@ -49,7 +52,7 @@ const AllDays = (props) => {
         // set the day's name of the week
         const dayOfTheWeek = currentDay.toLocaleString("en-US", {weekday: "long"});
         const dayNumber = currentDay.getDate()
-        const currentState = checkDayFulfilled(dayNumber)
+        const currentState = getPreviousState(dayNumber)
 
         allDaysInMonth.push(
             {day: dayNumber, dayOfTheWeek: dayOfTheWeek, currentState: currentState}
@@ -60,14 +63,16 @@ const AllDays = (props) => {
     const allDaysContent = (
         <Grid container spacing={3}>
                 {allDaysInMonth.map((day)=>{
-                    return <OneDay
-                        key={day.day}
-                        day={day.day}
-                        month={month}
-                        year={year}
-                        dayOfTheWeek={day.dayOfTheWeek}
-                        currentState={day.currentState}
-                    />
+                    return(
+                        <OneDay
+                            key={day.day}
+                            day={day.day}
+                            month={month}
+                            year={year}
+                            dayOfTheWeek={day.dayOfTheWeek}
+                            currentState={day.currentState}
+                        />
+                    )
                 })}
         </Grid>
     )

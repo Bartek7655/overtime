@@ -2,34 +2,113 @@ import React, {useEffect, useState} from "react"
 import {Button, Grid, Typography} from "@mui/material";
 import AllDays from "./AllDays.jsx";
 import {useDispatch, useSelector} from "react-redux";
+
+import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 import {uploadNotSavedOvertime} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 
 
 const CountOvertime = () => {
-    const [month, setMonth] = useState(new Date().getMonth())
+    const [date, setDate] = useState({
+        month: new Date().getMonth(),
+        year: new Date().getFullYear()
+    })
+    const [totalOvertime, setTotalOvertime] = useState(0)
+    const [shownStringOvertime, setShownStringOvertime] = useState(convertOvertimeToShownString(totalOvertime))
     const dispatch = useDispatch()
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
-    const year = new Date().getFullYear()
-    const day = new Date().getDate()
+
     //get month's name
-    const monthName = monthNames[month]
-    const entities = useSelector(state => state.notSavedOvertime.entities)
+    const monthName = monthNames[date.month]
+    const notSavedOvertime = useSelector(state => state.notSavedOvertime.entities)
+    const savedOvertime = useSelector(state => state.getOvertime.entities)
 
+    useEffect(() => setTotalOvertime(0), [date])
 
-    const handleButton = (event) => {
+    useEffect(() => setShownStringOvertime(convertOvertimeToShownString(totalOvertime)), [totalOvertime])
+
+    useEffect(() => {
+        let overtime = 0
+
+        if(notSavedOvertime){
+            overtime = accumulationOvertime(notSavedOvertime)
+        }
+        if(savedOvertime){
+            overtime += accumulationOvertime(savedOvertime)
+        }
+        if(notSavedOvertime && savedOvertime){
+            overtime += checkDoubleDay(savedOvertime, notSavedOvertime)
+        }
+
+        setTotalOvertime(overtime)
+    }, [notSavedOvertime])
+
+    useEffect(() => {
+        if(savedOvertime) {
+            setTotalOvertime(accumulationOvertime(savedOvertime))
+        }
+
+    }, [savedOvertime])
+
+    const accumulationOvertime = (days) => {
+        let overtime = 0
+        days.forEach(day => overtime += day.overtime)
+
+        return overtime
+    }
+
+    const checkDoubleDay = (savedOvertime, notSavedOvertime) => {
+        let doubledOvertime = 0
+        notSavedOvertime.forEach(notSavedDay => {
+            savedOvertime.forEach(savedDay => {
+                if(Number(notSavedDay.date.split('-')[2]) === Number(savedDay.date.split('-')[2])){
+                    doubledOvertime -= savedDay.overtime
+                }
+            })
+        })
+
+        return doubledOvertime
+    }
+
+    const changeMonth = (event) => {
         if(event.target.name === 'next'){
-            setMonth(prevState => prevState + 1)
+            if(date.month === 11){
+                setDate((prevState) => (
+                    {
+                        year: prevState.year + 1,
+                        month: 0
+                    }
+                ))
+            }else{
+                setDate((prevState) => ({
+                    ...prevState,
+                    month: prevState.month + 1
+                })
+            )}
+
         }else{
-            setMonth(prevState => prevState - 1)
+            if(date.month === 0){
+                setDate((prevState) => ({
+                    year: prevState.year -1,
+                    month: 11
+                }))
+            }else{
+                setDate((prevState) => ({
+                    ...prevState,
+                    month: prevState.month -1
+                }))
+            }
         }
     }
 
+
     const saveOverTime = () => {
-        dispatch(uploadNotSavedOvertime(entities))
+        dispatch(uploadNotSavedOvertime(notSavedOvertime))
+
     }
+
 
     return(
         <Grid container spacing={2}>
@@ -39,7 +118,7 @@ const CountOvertime = () => {
                         <Button
                             name='previous'
                             variant="contained"
-                            onClick={handleButton}>
+                            onClick={changeMonth}>
                             &larr; previous
                         </Button>
                     </Grid>
@@ -52,7 +131,7 @@ const CountOvertime = () => {
                         <Button
                             name='next'
                             variant="contained"
-                            onClick={handleButton}>
+                            onClick={changeMonth}>
                             &rarr; next
                         </Button>
                     </Grid>
@@ -60,7 +139,13 @@ const CountOvertime = () => {
 
             </Grid>
             <Grid item>
-                <AllDays year={year} month={month}/>
+                <AllDays year={date.year} month={date.month}/>
+            </Grid>
+
+            <Grid item>
+                <Typography variant="h5">
+                    Total overtime {shownStringOvertime}
+                </Typography>
             </Grid>
 
             <Grid item>
