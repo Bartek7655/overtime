@@ -20,13 +20,16 @@ const AllDays = (props) => {
     }, [month])
 
 
+
     let currentDay = firstDayOfMonth
     let allDaysInMonth = []
 
-    const checkDayFulfilled = (dayNumber) => {
+    const getPreviousState = (dayNumber) => {
         let fulfilledDay = {
             start_time: '',
-            end_time: ''
+            end_time: '',
+            sickness: false,
+            holiday: false
         }
         if (overtimeFromDatabase){
             overtimeFromDatabase.forEach(day => {
@@ -49,7 +52,7 @@ const AllDays = (props) => {
         // set the day's name of the week
         const dayOfTheWeek = currentDay.toLocaleString("en-US", {weekday: "long"});
         const dayNumber = currentDay.getDate()
-        const currentState = checkDayFulfilled(dayNumber)
+        const currentState = getPreviousState(dayNumber)
 
         allDaysInMonth.push(
             {day: dayNumber, dayOfTheWeek: dayOfTheWeek, currentState: currentState}
