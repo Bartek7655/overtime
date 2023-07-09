@@ -5,7 +5,7 @@ export const getOvertime = createAsyncThunk(
     "overtime/get",
     async(data) => {
         try{
-            const response = await axiosInstance.get(`api/get-overtime/${data.test}/${data.year}/`)
+            const response = await axiosInstance.get(`api/get-overtime/${data.monthToFetch}/${data.year}/`)
             return response.data
         } catch (error) {
             console.log("Getting overtime error: ", error.message)

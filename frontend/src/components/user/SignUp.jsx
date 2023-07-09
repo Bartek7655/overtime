@@ -17,10 +17,10 @@ const SignUp = () => {
         )
             .then((response) => {
                 if(response.data.email){
-                    navigate("/login"), {state: {email:response.data.email}}
+                    navigate("/signin"), {state: {email:response.data.email}}
                 }
             })
-            .catch((error)=>console.log('tu', erro, ' tam'))
+            .catch((error)=>console.log('tu', error, ' tam'))
     }
 
     return(
