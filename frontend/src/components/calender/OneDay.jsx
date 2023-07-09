@@ -205,9 +205,16 @@ const OneDay = (props) => {
         return differenceInMinutes
     }
 
-
       const showDay = () => {
-        setOffDay((prevState) => !prevState)
+
+          setOffDay((prevState) => !prevState)
+          if(holiday){
+              setHoliday(false)
+          }
+          if(sickness){
+              setSickness(false)
+          }
+          setSomethingChanged(true)
       };
 
     return(
@@ -255,35 +262,50 @@ const OneDay = (props) => {
                         </Button>
                       )}
                 </Grid>
+                {!offDay && (
+                    <Grid item xs={2} container>
+                        <Grid item color={"purple"}>
+                        {finishOvertime}
+                        </Grid>
 
-                <Grid item xs={2} color={"purple"}>
-                    {finishOvertime}
-                </Grid>
-
-                <Grid item xs={2}>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => {
-                            setSickness(prev => !prev)
-                            setSomethingChanged(true)
-                        }}
-                    >
-                        Sickness
-                    </Button>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        onClick={() => {
-                            setHoliday(prev => !prev)
-                            setSomethingChanged(true)
-                        }}
-                    >
-                        Holiday
-                    </Button>
-                </Grid>
+                        <Grid item>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                onClick={() => {
+                                    setSickness(prev => !prev)
+                                    setSomethingChanged(true)
+                                }}
+                            >
+                                Sickness
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                onClick={() => {
+                                    setHoliday(prev => !prev)
+                                    setSomethingChanged(true)
+                                }}
+                            >
+                                Holiday
+                            </Button>
+                        </Grid>
+                    </Grid>
+                )}
+            </Grid>
+            <Grid>
+                {sickness && (
+                    <Typography>
+                        You were sickness
+                    </Typography>
+                )}
+                {holiday && (
+                    <Typography>
+                        You had a holiday
+                    </Typography>
+                )}
             </Grid>
         </Grid>
     )
