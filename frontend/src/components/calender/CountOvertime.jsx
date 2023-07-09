@@ -8,7 +8,10 @@ import {uploadNotSavedOvertime} from "../../redux/slices/overtime/notSavedOverti
 
 
 const CountOvertime = () => {
-    const [month, setMonth] = useState(new Date().getMonth())
+    const [date, setDate] = useState({
+        month: new Date().getMonth(),
+        year: new Date().getFullYear()
+    })
     const [totalOvertime, setTotalOvertime] = useState(0)
     const [shownStringOvertime, setShownStringOvertime] = useState(convertOvertimeToShownString(totalOvertime))
     const dispatch = useDispatch()
@@ -16,14 +19,13 @@ const CountOvertime = () => {
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
-    const year = new Date().getFullYear()
-    const day = new Date().getDate()
+
     //get month's name
-    const monthName = monthNames[month]
+    const monthName = monthNames[date.month]
     const notSavedOvertime = useSelector(state => state.notSavedOvertime.entities)
     const savedOvertime = useSelector(state => state.getOvertime.entities)
 
-    useEffect(() => setTotalOvertime(0), [month])
+    useEffect(() => setTotalOvertime(0), [date])
 
     useEffect(() => setShownStringOvertime(convertOvertimeToShownString(totalOvertime)), [totalOvertime])
 
@@ -70,16 +72,41 @@ const CountOvertime = () => {
         return doubledOvertime
     }
 
-    const handleButton = (event) => {
+    const changeMonth = (event) => {
         if(event.target.name === 'next'){
-            setMonth(prevState => prevState + 1)
+            if(date.month === 11){
+                setDate((prevState) => (
+                    {
+                        year: prevState.year + 1,
+                        month: 0
+                    }
+                ))
+            }else{
+                setDate((prevState) => ({
+                    ...prevState,
+                    month: prevState.month + 1
+                })
+            )}
+
         }else{
-            setMonth(prevState => prevState - 1)
+            if(date.month === 0){
+                setDate((prevState) => ({
+                    year: prevState.year -1,
+                    month: 11
+                }))
+            }else{
+                setDate((prevState) => ({
+                    ...prevState,
+                    month: prevState.month -1
+                }))
+            }
         }
     }
 
+
     const saveOverTime = () => {
         dispatch(uploadNotSavedOvertime(notSavedOvertime))
+
     }
 
 
@@ -91,7 +118,7 @@ const CountOvertime = () => {
                         <Button
                             name='previous'
                             variant="contained"
-                            onClick={handleButton}>
+                            onClick={changeMonth}>
                             &larr; previous
                         </Button>
                     </Grid>
@@ -104,7 +131,7 @@ const CountOvertime = () => {
                         <Button
                             name='next'
                             variant="contained"
-                            onClick={handleButton}>
+                            onClick={changeMonth}>
                             &rarr; next
                         </Button>
                     </Grid>
@@ -112,7 +139,7 @@ const CountOvertime = () => {
 
             </Grid>
             <Grid item>
-                <AllDays year={year} month={month}/>
+                <AllDays year={date.year} month={date.month}/>
             </Grid>
 
             <Grid item>

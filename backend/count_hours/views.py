@@ -37,18 +37,35 @@ class TypeOvertime(CreateAPIView):
                 user__id=data["user"],
                 date=data["date"]
             )
-            return False, created_object
+            return True, created_object
 
         except Overtime.DoesNotExist:
-            return True, None
+            return False, None
+
+    @staticmethod
+    def check_if_delete(created_object):
+        print('object', created_object.date)
+        print('date', created_object.date)
+        print('sickness', created_object.sickness)
+        if (not created_object.start_time and not created_object.end_time
+                and not created_object.sickness and not created_object.holiday):
+            print('delete')
+            created_object.delete()
+            return True
+
+    @staticmethod
+    def check_time(time):
+        return time if time else None
 
     def create(self, request, *args, **kwargs):
         overtime_data = self.request.data
+        print('overtime_data', overtime_data)
         data_list = []
         for item in overtime_data:
+            print('item', item)
             data = {
-                "start_time": item.get('start_time'),
-                "end_time": item.get('end_time'),
+                "start_time": self.check_time(item.get('start_time')),
+                "end_time": self.check_time(item.get('end_time')),
                 "date": self.transform_date(item.get('date')),
                 "overtime": item.get('overtime'),
                 "sickness": item.get('sickness'),
@@ -57,14 +74,17 @@ class TypeOvertime(CreateAPIView):
             }
             created, created_object = self.check_unique(data)
             if created:
-                data_list.append(data)
-            else:
+                print('created')
                 created_object.overtime = data['overtime']
                 created_object.start_time = data['start_time']
                 created_object.end_time = data['end_time']
-                created_object.end_time = data['sickness']
-                created_object.end_time = data['holiday']
-                created_object.save()
+                created_object.sickness = data['sickness']
+                created_object.holiday = data['holiday']
+                if not self.check_if_delete(created_object):
+                    created_object.save()
+
+            else:
+                data_list.append(data)
 
         serializer = self.get_serializer(data=data_list, many=True)
         serializer.is_valid(raise_exception=True)
