@@ -19,7 +19,7 @@ const getOvertimeSlice = createSlice({
     name: "getOvertime",
     initialState: {
         loading: true,
-        entities: null,
+        entities: [],
         error: null
     },
     reducers: {
