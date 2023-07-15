@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import Input from "react-validation/build/input";
 import {email, password_same, required} from "../../validators/validators.jsx";
 import {Button} from "@mui/material";
@@ -7,21 +7,21 @@ import axiosInstance from "../../axios/axios";
 import {useNavigate} from "react-router";
 
 const SignUp = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const signup = (event) => {
-        event.preventDefault()
-        const data = new FormData(event.target)
+        event.preventDefault();
+        const data = new FormData(event.target);
         axiosInstance.post(
             "account/signup/", data
         )
             .then((response) => {
                 if(response.data.email){
-                    navigate("/signin"), {state: {email:response.data.email}}
+                    navigate("/signin"), {state: {email:response.data.email}};
                 }
             })
-            .catch((error)=>console.log('tu', error, ' tam'))
-    }
+            .catch((error)=>console.log('tu', error, ' tam'));
+    };
 
     return(
         <Form onSubmit={signup}>
@@ -53,7 +53,7 @@ const SignUp = () => {
 
             <Button type="submit" variant="contained" >Create Account</Button>
         </Form>
-    )
-}
+    );
+};
 
-export default SignUp
+export default SignUp;

@@ -4,8 +4,8 @@ import AppBarOvertime from "./main/AppBarOvertime.jsx";
 
 export function App() {
   return (
-      <AppBarOvertime/>
+        <AppBarOvertime/>
   );
 }
 
-export default App
+export default App;

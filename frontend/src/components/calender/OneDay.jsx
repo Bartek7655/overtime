@@ -1,31 +1,32 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react";
 import {Button, Grid, Typography} from "@mui/material";
-import Form from "react-validation/build/form"
-import Input from "react-validation/build/input"
+import Form from "react-validation/build/form";
+import Input from "react-validation/build/input";
 import {useDispatch} from "react-redux";
 import {addNewDay} from "../../redux/slices/overtime/notSavedOvertimeSlice";
 import {convertOvertimeToShownString} from "../utils/createStringOvertime";
+import PropTypes from "prop-types";
 
 const OneDay = (props) => {
-    const [finishOvertime, setFinishOvertime] = useState('')
-    const [sickness, setSickness] = useState(false)
-    const [holiday, setHoliday] = useState(false)
-    const [somethingChanged, setSomethingChanged] = useState(false)
-    const {day, month, year, dayOfTheWeek, currentState} = props
-    const [time, setTime] = useState({})
-    const [offDay, setOffDay] = useState(true)
+    const [finishOvertime, setFinishOvertime] = useState('');
+    const [sickness, setSickness] = useState(false);
+    const [holiday, setHoliday] = useState(false);
+    const [somethingChanged, setSomethingChanged] = useState(false);
+    const {day, month, year, dayOfTheWeek, currentState} = props;
+    const [time, setTime] = useState({});
+    const [offDay, setOffDay] = useState(true);
     const [currentTime, setCurrentTime] = useState({
         start_time: '',
         end_time: ''
-    })
+    });
 
     useEffect(() => {
         if(currentState.overtime){
             setFinishOvertime(
                 convertOvertimeToShownString(currentState.overtime)
-            )
+            );
         }else{
-            setFinishOvertime('')
+            setFinishOvertime('');
         }
 
         if(
@@ -38,21 +39,21 @@ const OneDay = (props) => {
                 start_time: currentState.start_time ? currentState.start_time : '',
                 end_time: currentState.end_time ? currentState.end_time : '',
             }
-        )}
+        );}
         if(sickness !== currentState.sickness){
-            setSickness(currentState.sickness)
+            setSickness(currentState.sickness);
         }
         if (holiday !== currentState.holiday){
-            setHoliday(currentState.holiday)
+            setHoliday(currentState.holiday);
         }
 
-    },[currentState])
+    },[currentState]);
 
     useEffect(() => {
-        checkOffDay()
-    },[month, sickness, holiday])
+        checkOffDay();
+    },[month, sickness, holiday]);
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if(
@@ -63,12 +64,12 @@ const OneDay = (props) => {
             currentState.sickness !== sickness ||
             currentState.holiday !== holiday)
         ){
-            addNotSavedDay()
+            addNotSavedDay();
         }
-    },[time, sickness, holiday])
+    },[time, sickness, holiday]);
 
     const addNotSavedDay = () => {
-        const overtime = count(time.start_time, time.end_time)
+        const overtime = count(time.start_time, time.end_time);
         dispatch(addNewDay(
             {
                 start_time: time.start_time,
@@ -78,25 +79,25 @@ const OneDay = (props) => {
                 sickness: sickness,
                 date: setCurrentDate()
             }
-        ))
-    }
+        ));
+    };
 
     const changeCurrentState = (event) => {
-        const eventTime = event.target.value
+        const eventTime = event.target.value;
 
         if(event.target.name.includes('start')){
             setCurrentTime((prevState) => ({
                 ...prevState,
                 start_time: eventTime
-            }))
+            }));
         }else{
             setCurrentTime((prevState) => ({
                 ...prevState,
                 end_time: eventTime
-            }))
+            }));
         }
 
-    }
+    };
 
     const checkOffDay = () => {
         if(
@@ -104,117 +105,117 @@ const OneDay = (props) => {
             sickness ||
             holiday
         ){
-            setOffDay(true)
+            setOffDay(true);
         }else{
-            setOffDay(false)
+            setOffDay(false);
         }
-    }
+    };
 
     const checkPreviousFulfilled = () => {
         return !!currentState.start_time || !!currentState.end_time ||
-            currentState.sickness || currentState.holiday
-    }
+            currentState.sickness || currentState.holiday;
+    };
 
     const convertMillisecondsToMinutes = (milliseconds) => {
-        return Math.floor(milliseconds/60000)
-    }
+        return Math.floor(milliseconds/60000);
+    };
 
     const convertStringToTime = (string) => {
         try{
-            const [hours, minutes] = string.split(":")
-            return setTimeObject(hours, minutes)
+            const [hours, minutes] = string.split(":");
+            return setTimeObject(hours, minutes);
 
         }catch (error){
-            console.error("An error occurred: ", string)
-            return null
+            console.error("An error occurred: ", string);
+            return null;
         }
-    }
+    };
 
     const count = (startTimeString, endTimeString) => {
         if(startTimeString && endTimeString) {
-            const startTime = convertStringToTime(startTimeString)
-            const endTime = convertStringToTime(endTimeString)
-            const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime)
-            let timeWithoutPause = subtract_pause(differenceInMinutes)
+            const startTime = convertStringToTime(startTimeString);
+            const endTime = convertStringToTime(endTimeString);
+            const differenceInMinutes = convertMillisecondsToMinutes(endTime - startTime);
+            let timeWithoutPause = subtract_pause(differenceInMinutes);
             if(isWeekend()){
-                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause));
             }else{
-                timeWithoutPause = subtractEightHours(timeWithoutPause)
-                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause))
+                timeWithoutPause = subtractEightHours(timeWithoutPause);
+                setFinishOvertime(convertOvertimeToShownString(timeWithoutPause));
             }
-            return timeWithoutPause
+            return timeWithoutPause;
         }else{
-            return null
+            return null;
         }
-    }
+    };
 
 
     const handleInput = (event) => {
-        setSomethingChanged(true)
-        const eventTime = event.target.value
+        setSomethingChanged(true);
+        const eventTime = event.target.value;
         if(checkPreviousFulfilled()){
             setTime({
                 start_time: currentTime.start_time,
                 end_time: currentTime.end_time
-            })
+            });
         } else if(event.target.name.includes('start')){
             setTime({
                 start_time: eventTime
-            })
+            });
         } else{
             setTime((prevState) => ({
                 ...prevState,
                     end_time: eventTime
-                    }))
+                    }));
         }
-    }
+    };
 
     const isWeekend = () => {
-        let checkWeekend = new Date(year, month, day).getDay()
+        let checkWeekend = new Date(year, month, day).getDay();
         return checkWeekend === 0 || checkWeekend === 6;
-    }
+    };
 
     const setTimeObject = (hours, minutes) => {
-        return new Date(`July 1, 1999, ${hours}:${minutes}:00`)
-    }
+        return new Date(`July 1, 1999, ${hours}:${minutes}:00`);
+    };
 
     const setCurrentDate = () => {
-        return `${year}-${month+1}-${day}`
-    }
+        return `${year}-${month+1}-${day}`;
+    };
 
 
     const subtractEightHours = (workingTimeInMinutes) => {
-        const eightHours = 480
-        return workingTimeInMinutes - eightHours
-    }
+        const eightHours = 480;
+        return workingTimeInMinutes - eightHours;
+    };
 
     const subtract_pause = (differenceInMinutes) => {
-        const twelveHours = {"minutes": 720, "pause": 15}
-        const nineHours = {"minutes": 540, "pause": 15}
-        const sixHours = {"minutes": 360, "pause" : 30}
+        const twelveHours = {"minutes": 720, "pause": 15};
+        const nineHours = {"minutes": 540, "pause": 15};
+        const sixHours = {"minutes": 360, "pause" : 30};
 
         if(differenceInMinutes >= sixHours.minutes){
-            differenceInMinutes = differenceInMinutes - sixHours.pause
+            differenceInMinutes = differenceInMinutes - sixHours.pause;
         }
         if(differenceInMinutes >= nineHours.minutes){
-            differenceInMinutes = differenceInMinutes - nineHours.pause
+            differenceInMinutes = differenceInMinutes - nineHours.pause;
         }
         if(differenceInMinutes >= twelveHours.minutes){
-            differenceInMinutes = differenceInMinutes - twelveHours.pause
+            differenceInMinutes = differenceInMinutes - twelveHours.pause;
         }
-        return differenceInMinutes
-    }
+        return differenceInMinutes;
+    };
 
       const showDay = () => {
 
-          setOffDay((prevState) => !prevState)
+          setOffDay((prevState) => !prevState);
           if(holiday){
-              setHoliday(false)
+              setHoliday(false);
           }
           if(sickness){
-              setSickness(false)
+              setSickness(false);
           }
-          setSomethingChanged(true)
+          setSomethingChanged(true);
       };
 
     return(
@@ -274,8 +275,8 @@ const OneDay = (props) => {
                                 variant="outlined"
                                 color="error"
                                 onClick={() => {
-                                    setSickness(prev => !prev)
-                                    setSomethingChanged(true)
+                                    setSickness(prev => !prev);
+                                    setSomethingChanged(true);
                                 }}
                             >
                                 Sickness
@@ -285,8 +286,8 @@ const OneDay = (props) => {
                                 variant="outlined"
                                 color="error"
                                 onClick={() => {
-                                    setHoliday(prev => !prev)
-                                    setSomethingChanged(true)
+                                    setHoliday(prev => !prev);
+                                    setSomethingChanged(true);
                                 }}
                             >
                                 Holiday
@@ -308,7 +309,15 @@ const OneDay = (props) => {
                 )}
             </Grid>
         </Grid>
-    )
-}
+    );
+};
 
-export default OneDay
+OneDay.propTypes = {
+    day: PropTypes.number,
+    month: PropTypes.number,
+    year: PropTypes.number,
+    dayOfTheWeek: PropTypes.string,
+    currentState: PropTypes.object
+};
+
+export default OneDay;

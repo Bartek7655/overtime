@@ -16,7 +16,7 @@ const Routers = () => {
             <Route path="/signout" element={<SignOut />} />
             <Route path="/countovertime" element={<CountOvertime/>} />
         </Routes>
-    )
-}
+    );
+};
 
-export default Routers
+export default Routers;
