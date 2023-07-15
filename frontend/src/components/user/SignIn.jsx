@@ -1,7 +1,7 @@
-import React from "react"
+import React from "react";
 
-import Form from "react-validation/build/form"
-import Input from "react-validation/build/input"
+import Form from "react-validation/build/form";
+import Input from "react-validation/build/input";
 import {required, email} from "../../validators/validators.jsx";
 import {Button} from "@mui/material";
 import {useDispatch} from "react-redux";
@@ -11,15 +11,15 @@ import {signIn} from "../../redux/slices/profileSlice";
 
 
 const SignIn = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     const signin = (event) => {
         event.preventDefault();
         const data = new FormData(event.target);
         dispatch(signIn(data)).unwrap()
-            .then(response => window.location.replace('/')
-            )
-    }
+            .then(() => window.location.replace('/')
+            );
+    };
 
     return (
         <Form onSubmit={signin}>
@@ -42,7 +42,7 @@ const SignIn = () => {
 
             <Button type="submit" variant="contained" >Login</Button>
         </Form>
-    )
-}
+    );
+};
 
-export default SignIn
+export default SignIn;

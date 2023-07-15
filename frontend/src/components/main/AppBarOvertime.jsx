@@ -21,23 +21,23 @@ const settings = {
 };
 
 if(loged()){
-    settings['Type Overtime'] = '/countovertime'
-    settings['Sign Out'] = '/signout'
+    settings['Type Overtime'] = '/countovertime';
+    settings['Sign Out'] = '/signout';
 }else{
-    settings['Sign In'] = '/signin'
-    settings['Sign Up'] = '/signup'
+    settings['Sign In'] = '/signin';
+    settings['Sign Up'] = '/signup';
 }
 
 const AppBarOvertime = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSettings = (url) => {
-      handleCloseUserMenu()
-      navigate(url)
-  }
+      handleCloseUserMenu();
+      navigate(url);
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -177,6 +177,6 @@ const AppBarOvertime = () => {
       </Container>
     </AppBar>
   );
-}
+};
 
 export default AppBarOvertime;

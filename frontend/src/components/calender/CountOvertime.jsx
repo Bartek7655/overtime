@@ -1,76 +1,77 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react";
 import {Button, Grid, Typography} from "@mui/material";
 import AllDays from "./AllDays.jsx";
 import {useDispatch, useSelector} from "react-redux";
 
 import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 import {uploadNotSavedOvertime} from "../../redux/slices/overtime/notSavedOvertimeSlice";
+import {getCurrentDate} from "../utils/getDate";
 
 
 const CountOvertime = () => {
     const [date, setDate] = useState({
-        month: new Date().getMonth(),
-        year: new Date().getFullYear()
-    })
-    const [totalOvertime, setTotalOvertime] = useState(0)
-    const [shownStringOvertime, setShownStringOvertime] = useState(convertOvertimeToShownString(totalOvertime))
-    const dispatch = useDispatch()
+        month: getCurrentDate().month,
+        year: getCurrentDate().year
+    });
+    const [totalOvertime, setTotalOvertime] = useState(0);
+    const [shownStringOvertime, setShownStringOvertime] = useState(convertOvertimeToShownString(totalOvertime));
+    const dispatch = useDispatch();
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
 
     //get month's name
-    const monthName = monthNames[date.month]
-    const notSavedOvertime = useSelector(state => state.notSavedOvertime.entities)
-    const savedOvertime = useSelector(state => state.getOvertime.entities)
+    const monthName = monthNames[date.month];
+    const notSavedOvertime = useSelector(state => state.notSavedOvertime.entities);
+    const savedOvertime = useSelector(state => state.getOvertime.entities);
 
-    useEffect(() => setTotalOvertime(0), [date])
+    useEffect(() => setTotalOvertime(0), [date]);
 
-    useEffect(() => setShownStringOvertime(convertOvertimeToShownString(totalOvertime)), [totalOvertime])
+    useEffect(() => setShownStringOvertime(convertOvertimeToShownString(totalOvertime)), [totalOvertime]);
 
     useEffect(() => {
-        let overtime = 0
+        let overtime = 0;
 
         if(notSavedOvertime){
-            overtime = accumulationOvertime(notSavedOvertime)
+            overtime = accumulationOvertime(notSavedOvertime);
         }
         if(savedOvertime){
-            overtime += accumulationOvertime(savedOvertime)
+            overtime += accumulationOvertime(savedOvertime);
         }
         if(notSavedOvertime && savedOvertime){
-            overtime += checkDoubleDay(savedOvertime, notSavedOvertime)
+            overtime += checkDoubleDay(savedOvertime, notSavedOvertime);
         }
 
-        setTotalOvertime(overtime)
-    }, [notSavedOvertime])
+        setTotalOvertime(overtime);
+    }, [notSavedOvertime]);
 
     useEffect(() => {
         if(savedOvertime) {
-            setTotalOvertime(accumulationOvertime(savedOvertime))
+            setTotalOvertime(accumulationOvertime(savedOvertime));
         }
 
-    }, [savedOvertime])
+    }, [savedOvertime]);
 
     const accumulationOvertime = (days) => {
-        let overtime = 0
-        days.forEach(day => overtime += day.overtime)
+        let overtime = 0;
+        days.forEach(day => overtime += day.overtime);
 
-        return overtime
-    }
+        return overtime;
+    };
 
     const checkDoubleDay = (savedOvertime, notSavedOvertime) => {
-        let doubledOvertime = 0
+        let doubledOvertime = 0;
         notSavedOvertime.forEach(notSavedDay => {
             savedOvertime.forEach(savedDay => {
                 if(Number(notSavedDay.date.split('-')[2]) === Number(savedDay.date.split('-')[2])){
-                    doubledOvertime -= savedDay.overtime
+                    doubledOvertime -= savedDay.overtime;
                 }
-            })
-        })
+            });
+        });
 
-        return doubledOvertime
-    }
+        return doubledOvertime;
+    };
 
     const changeMonth = (event) => {
         if(event.target.name === 'next'){
@@ -80,34 +81,34 @@ const CountOvertime = () => {
                         year: prevState.year + 1,
                         month: 0
                     }
-                ))
+                ));
             }else{
                 setDate((prevState) => ({
                     ...prevState,
                     month: prevState.month + 1
                 })
-            )}
+            );}
 
         }else{
             if(date.month === 0){
                 setDate((prevState) => ({
                     year: prevState.year -1,
                     month: 11
-                }))
+                }));
             }else{
                 setDate((prevState) => ({
                     ...prevState,
                     month: prevState.month -1
-                }))
+                }));
             }
         }
-    }
+    };
 
 
     const saveOverTime = () => {
-        dispatch(uploadNotSavedOvertime(notSavedOvertime))
+        dispatch(uploadNotSavedOvertime(notSavedOvertime));
 
-    }
+    };
 
 
     return(
@@ -157,7 +158,7 @@ const CountOvertime = () => {
                 </Button>
             </Grid>
         </Grid>
-    )
-}
+    );
+};
 
-export default CountOvertime
+export default CountOvertime;

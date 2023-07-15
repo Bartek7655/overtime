@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit';
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axiosInstance from "../../../axios/axios";
 
@@ -6,14 +6,14 @@ export const uploadNotSavedOvertime = createAsyncThunk(
     "overtime/upload",
     async(data) => {
         try{
-            const response = await axiosInstance.post('api/type-overtime/', data)
-            return response.data
+            const response = await axiosInstance.post('api/type-overtime/', data);
+            return response.data;
         } catch (error) {
-            console.log("Uploading overtime error: ", error.message)
-            throw error
+            console.log("Uploading overtime error: ", error.message);
+            throw error;
         }
     }
-)
+);
 
 
 const notSavedOvertimeSlice = createSlice({
@@ -25,17 +25,17 @@ const notSavedOvertimeSlice = createSlice({
     },
     reducers: {
         addNewDay: (state, action) => {
-            let changed
+            let changed;
             state.entities.forEach(element => {
                 if(element.date === action.payload.date){
-                    element.overtime = action.payload.overtime
-                    element.start_time = action.payload.start_time
-                    element.end_time = action.payload.end_time
-                    changed = true
+                    element.overtime = action.payload.overtime;
+                    element.start_time = action.payload.start_time;
+                    element.end_time = action.payload.end_time;
+                    changed = true;
                 }
-            })
+            });
             if(!changed){
-                state.entities.push(action.payload)
+                state.entities.push(action.payload);
             }
         },
     },
@@ -44,16 +44,15 @@ const notSavedOvertimeSlice = createSlice({
             .addCase(uploadNotSavedOvertime.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(uploadNotSavedOvertime.fulfilled, (state, action) => {
+            .addCase(uploadNotSavedOvertime.fulfilled, (state) => {
                 state.loading = false;
-                // state.entities = action.payload;
             })
             .addCase(uploadNotSavedOvertime.rejected, (state, action) => {
                 state.loading = false;
-                state.entities = action.payload
-            })
+                state.entities = action.payload;
+            });
     }
-})
+});
 
-export const {addNewDay} = notSavedOvertimeSlice.actions
-export const notSavedOvertimeReducer = notSavedOvertimeSlice.reducer
+export const {addNewDay} = notSavedOvertimeSlice.actions;
+export const notSavedOvertimeReducer = notSavedOvertimeSlice.reducer;

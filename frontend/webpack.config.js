@@ -5,7 +5,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 module.exports = {
-    mode:"development",
+    mode: "development",
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
@@ -18,7 +18,7 @@ module.exports = {
         filename: 'bundle.js'
     },
     devServer: {
-        static:{
+        static: {
             directory: path.resolve(__dirname, 'dist'),
         },
         historyApiFallback: true,
@@ -27,24 +27,24 @@ module.exports = {
         port: 3001
     },
     module: {
-    rules: [
-      {
-        test: /\.(jsx|js)$/,
-        include: path.resolve(__dirname, 'src'),
-        exclude: /node_modules/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              ['@babel/preset-env', {
-                "targets": "defaults"
-              }],
-              '@babel/preset-react'
-            ]
-          }
-        },
+        rules: [
+            {
+                test: /\.(jsx|js)$/,
+                include: path.resolve(__dirname, 'src'),
+                exclude: /node_modules/,
+                use: [{
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                "targets": "defaults"
+                            }],
+                            '@babel/preset-react'
+                        ]
+                    }
+                },
+                ]
+            }
         ]
-      }
-    ]
-  }
+    }
 }

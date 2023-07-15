@@ -22,7 +22,7 @@ axiosInstance.interceptors.response.use(
   function (error) {
     const originalRequest = error.config;
     const decodedToken = (token) => {
-      return jwt_decode(token)
+      return jwt_decode(token);
     };
 
     if (typeof error.response === "undefined") {
@@ -35,8 +35,8 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response.status === 401 && originalRequest.url === `${LOCALHOST}token/refresh/`) {
-      localStorage.removeItem("access_token")
-      localStorage.removeItem("refresh_token")
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
       window.location.href = "/signin/";
       return Promise.reject(error);
     }
@@ -84,4 +84,4 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-export default axiosInstance
+export default axiosInstance;

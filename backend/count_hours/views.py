@@ -108,7 +108,8 @@ class GetOvertime(ListAPIView):
         return first_day, last_day
 
     def get_queryset(self):
-        month = self.kwargs.get('month', None)
+        # the fetched month on the front side is counted from 0
+        month = int(self.kwargs.get('month', None)) + 1
         year = self.kwargs.get('year', None)
         if month and year:
             first_day, last_day = self.get_date_range(month, year)
