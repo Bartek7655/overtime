@@ -5,18 +5,30 @@ import store from "./redux/store";
 import {BrowserRouter} from "react-router-dom";
 import Routers from "./components/routers/Routers.jsx";
 import App from "./components/App.jsx";
-import {ThemeProvider} from "@mui/material";
-import theme from "./components/theme/theme";
+
+import {ThemeProvider} from "@mui/material/styles";
+import {createTheme} from '@mui/material/styles';
+
+const theme = createTheme({
+    mode: "dark",
+    palette: {
+        background: {
+            default: '#654e4e',
+        },
+    },
+});
 
 if (module.hot) module.hot.accept();
 
-const root = ReactDOM.createRoot(document.getElementById('app'))
+const root = ReactDOM.createRoot(document.getElementById('app'));
 
 root.render(
-        <Provider store={store}>
-            <BrowserRouter>
+    <Provider store={store}>
+        <BrowserRouter>
+            <ThemeProvider theme={theme}>
                 <App/>
-                <Routers/>
-            </BrowserRouter>
-        </Provider>
+            </ThemeProvider>
+            <Routers/>
+        </BrowserRouter>
+    </Provider>
 );

@@ -5,14 +5,14 @@ export const getOvertime = createAsyncThunk(
     "overtime/get",
     async(data) => {
         try{
-            const response = await axiosInstance.get(`api/get-overtime/${data.monthToFetch}/${data.year}/`)
-            return response.data
+            const response = await axiosInstance.get(`api/get-overtime/${data.month}/${data.year}/`);
+            return response.data;
         } catch (error) {
-            console.log("Getting overtime error: ", error.message)
-            throw error
+            console.log("Getting overtime error: ", error.message);
+            throw error;
         }
     }
-)
+);
 
 
 const getOvertimeSlice = createSlice({
@@ -39,8 +39,8 @@ const getOvertimeSlice = createSlice({
             .addCase(getOvertime.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
     }
-})
+});
 
-export const getOvertimeReducer = getOvertimeSlice.reducer
+export const getOvertimeReducer = getOvertimeSlice.reducer;
