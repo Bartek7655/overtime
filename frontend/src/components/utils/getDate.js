@@ -1,7 +1,7 @@
 export const getCurrentYearAndMonth = () => {
     const month = new Date().getMonth();
     const year = new Date().getFullYear();
-    return {month: month, year: year};
+    return {year: year, month: month};
 };
 
 export const getFullMonthName = (month) => {
