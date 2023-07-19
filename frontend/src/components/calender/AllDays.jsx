@@ -34,7 +34,7 @@ const AllDays = (props) => {
             sickness: false,
             holiday: false
         };
-        if (overtimeFromDatabase) {
+        if (overtimeFromDatabase.length > 0) {
             overtimeFromDatabase.forEach(day => {
                 if (parseInt(day.date.split('-')[2]) === dayNumber) {
                     fulfilledDay = day;

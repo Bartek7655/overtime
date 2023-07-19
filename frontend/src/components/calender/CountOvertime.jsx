@@ -5,24 +5,19 @@ import {useDispatch, useSelector} from "react-redux";
 
 import {convertOvertimeToShownString} from "../utils/createStringOvertime";
 import {uploadNotSavedOvertime} from "../../redux/slices/overtime/notSavedOvertimeSlice";
-import {getCurrentDate} from "../utils/getDate";
+import {getCurrentYearAndMonth, getFullMonthName} from "../utils/getDate";
 
 
 const CountOvertime = () => {
     const [date, setDate] = useState({
-        month: getCurrentDate().month,
-        year: getCurrentDate().year
+        month: getCurrentYearAndMonth().month,
+        year: getCurrentYearAndMonth().year
     });
     const [totalOvertime, setTotalOvertime] = useState(0);
     const [shownStringOvertime, setShownStringOvertime] = useState(convertOvertimeToShownString(totalOvertime));
     const dispatch = useDispatch();
-    const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
 
-    //get month's name
-    const monthName = monthNames[date.month];
+    const monthName = getFullMonthName(date.month);
     const notSavedOvertime = useSelector(state => state.notSavedOvertime.entities);
     const savedOvertime = useSelector(state => state.getOvertime.entities);
 

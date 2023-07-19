@@ -19,14 +19,10 @@ const getOvertimeSlice = createSlice({
     name: "getOvertime",
     initialState: {
         loading: true,
-        entities: null,
+        entities: [],
         error: null
     },
-    reducers: {
-        // addNewDay: (state, action) => {
-        //     state.entities.push(action.payload)
-        // }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(getOvertime.pending, (state) => {
